@@ -1,0 +1,76 @@
+name: Build and Deploy
+
+# Regenera index.html desde los 3 Excels de Drive y lo commitea al repo.
+# GitHub Pages sirve el archivo como sitio público.
+#
+# Triggers:
+#   - Manual (workflow_dispatch)
+#   - Cron cada hora (ajustable)
+on:
+  workflow_dispatch:
+  schedule:
+    # A los 0 minutos de cada hora. Cambiar a '0 */6 * * *' para cada 6 hs, etc.
+    - cron: '0 * * * *'
+
+# Opt-in a Node.js 24
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+# Permiso para commitear desde el workflow
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Write credentials.json from secret
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        run: |
+          if [ -z "$GOOGLE_CREDENTIALS" ]; then
+            echo "ERROR: el secret GOOGLE_CREDENTIALS está vacío."
+            exit 1
+          fi
+          echo "$GOOGLE_CREDENTIALS" > credentials.json
+
+      - name: Run build.py
+        env:
+          FILE_ID_AR: ${{ secrets.FILE_ID_AR }}
+          FILE_ID_CL: ${{ secrets.FILE_ID_CL }}
+          FILE_ID_UY: ${{ secrets.FILE_ID_UY }}
+        run: python build.py --json-out data.json --html-out index.html --template template.html
+
+      - name: Commit index.html and data.json if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Stagear solo lo que queremos commitear (NO credentials.json)
+          git add index.html data.json
+
+          # Si no hay cambios, git diff --cached devuelve exit 0 sin diff
+          if git diff --cached --quiet; then
+            echo "No hay cambios en index.html ni data.json. Nada que commitear."
+          else
+            echo "Hay cambios. Commiteando..."
+            git commit -m "[skip ci] Auto-build: actualizar dashboard ($(date -u +'%Y-%m-%d %H:%M UTC'))"
+            git push
+            echo "Push OK."
+          fi
+
+      - name: Cleanup credentials
+        if: always()
+        run: rm -f credentials.json
