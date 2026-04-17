@@ -1,0 +1,42 @@
+name: Test Drive Download
+
+# Trigger manual desde la pestaña Actions
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Write credentials.json from secret
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        run: |
+          if [ -z "$GOOGLE_CREDENTIALS" ]; then
+            echo "ERROR: el secret GOOGLE_CREDENTIALS está vacío."
+            echo "Agregalo en Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          echo "$GOOGLE_CREDENTIALS" > credentials.json
+          echo "credentials.json creado ($(wc -c < credentials.json) bytes)"
+
+      - name: Run test script
+        env:
+          FILE_ID_AR: ${{ secrets.FILE_ID_AR }}
+        run: python test_download.py
+
+      - name: Cleanup credentials
+        if: always()
+        run: rm -f credentials.json
