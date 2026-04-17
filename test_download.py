@@ -32,7 +32,8 @@ CREDENTIALS_PATH = SCRIPT_DIR / "credentials.json"
 SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 
 load_dotenv(SCRIPT_DIR / ".env")
-FILE_ID_AR = os.getenv("FILE_ID_AR")
+# .strip() para tolerar enters/espacios accidentales al pegar el secret
+FILE_ID_AR = (os.getenv("FILE_ID_AR") or "").strip()
 
 
 # --- Checks de setup -------------------------------------------------------
@@ -70,8 +71,26 @@ def get_drive_service():
     return build("drive", "v3", credentials=creds, cache_discovery=False)
 
 
+XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+GSHEET_MIME = "application/vnd.google-apps.spreadsheet"
+
+
 def download_file(service, file_id: str) -> bytes:
-    request = service.files().get_media(fileId=file_id)
+    # Primero averiguamos si es .xlsx (descarga directa) o Google Sheet nativo (export)
+    meta = service.files().get(
+        fileId=file_id, fields="name, mimeType"
+    ).execute()
+    name = meta.get("name", "<sin nombre>")
+    mime = meta.get("mimeType", "")
+    print(f"  archivo: {name} (mime: {mime})")
+
+    if mime == GSHEET_MIME:
+        # Google Sheet nativo → exportar como xlsx
+        request = service.files().export_media(fileId=file_id, mimeType=XLSX_MIME)
+    else:
+        # Archivo binario (xlsx subido) → descarga directa
+        request = service.files().get_media(fileId=file_id)
+
     buffer = io.BytesIO()
     downloader = MediaIoBaseDownload(buffer, request)
     done = False
@@ -90,7 +109,7 @@ def main():
     print(f"Autenticando con {CREDENTIALS_PATH.name}...")
     service = get_drive_service()
 
-    print(f"Bajando archivo {FILE_ID_AR}...")
+    print(f"Bajando archivo (id len={len(FILE_ID_AR)})...")
     content = download_file(service, FILE_ID_AR)
     print(f"OK: {len(content):,} bytes descargados\n")
 
