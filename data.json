@@ -35,7 +35,7 @@
         4910.3558,
         5153.672972413794,
         4486.146979310344,
-        1116.2095931034482
+        4486.146979310344
       ],
       "spend_meta": [
         4288.0,
@@ -53,7 +53,7 @@
         4390.65,
         4887.42,
         5063.0,
-        775.0
+        5063.0
       ],
       "spend_total": [
         14821.853164,
@@ -71,7 +71,7 @@
         9301.005799999999,
         10041.092972999999,
         9549.146979,
-        1891.209593
+        9549.146979
       ],
       "purch_total": [
         2422.0,
@@ -89,7 +89,7 @@
         3324.0,
         2907.0,
         3233.0,
-        187.0
+        3233.0
       ],
       "purch_search": [
         587.0,
@@ -107,7 +107,7 @@
         1385.0,
         1296.0,
         1031.0,
-        87.0
+        1031.0
       ],
       "purch_pmax": [
         428.0,
@@ -125,7 +125,7 @@
         419.0,
         291.0,
         740.0,
-        33.0
+        740.0
       ],
       "purch_meta": [
         42.0,
@@ -143,7 +143,7 @@
         20.0,
         27.0,
         34.0,
-        2.0
+        34.0
       ],
       "purch_organic": [
         1296.0,
@@ -161,7 +161,7 @@
         1432.0,
         1233.0,
         1378.0,
-        63.0
+        1378.0
       ],
       "purch_others": [
         69.0,
@@ -179,7 +179,7 @@
         68.0,
         60.0,
         50.0,
-        2.0
+        50.0
       ],
       "ses_total": [
         272634.0,
@@ -197,7 +197,7 @@
         232515.0,
         249668.0,
         283896.0,
-        15532.0
+        283896.0
       ],
       "ses_search": [
         41893.0,
@@ -215,7 +215,7 @@
         30020.0,
         32294.0,
         28068.0,
-        3065.0
+        28068.0
       ],
       "ses_pmax": [
         51975.0,
@@ -233,7 +233,7 @@
         25333.0,
         26388.0,
         33261.0,
-        1394.0
+        33261.0
       ],
       "ses_meta": [
         52032.0,
@@ -251,7 +251,7 @@
         61561.0,
         83879.0,
         85184.0,
-        3773.0
+        85184.0
       ],
       "ses_organic": [
         117518.0,
@@ -269,7 +269,7 @@
         110887.0,
         101564.0,
         122737.0,
-        6659.0
+        122737.0
       ],
       "ses_others": [
         9216.0,
@@ -287,75 +287,75 @@
         4714.0,
         5543.0,
         14646.0,
-        641.0
+        14646.0
       ]
     },
     "elas": {
       "total": {
         "spend_base": 9606.93,
-        "spend_actual": 5720.18,
-        "spend_nom": -3886.75,
-        "spend_pct": -40.46,
+        "spend_actual": 9549.15,
+        "spend_nom": -57.78,
+        "spend_pct": -0.6,
         "purch_base": 3295.5,
-        "purch_actual": 1710.0,
-        "purch_nom": -1585.5,
-        "purch_pct": -48.11,
+        "purch_actual": 3233.0,
+        "purch_nom": -62.5,
+        "purch_pct": -1.9,
         "ses_base": 240929.8,
-        "ses_actual": 149714.0,
-        "ses_nom": -91215.8,
-        "ses_pct": -37.86,
-        "e_purch": 1.189,
-        "e_ses": 0.936,
-        "mc_purch": 2.4514,
-        "mc_ses": 0.042611
+        "ses_actual": 283896.0,
+        "ses_nom": 42966.2,
+        "ses_pct": 17.83,
+        "e_purch": 3.153,
+        "e_ses": -29.651,
+        "mc_purch": 0.9245,
+        "mc_ses": -0.001345
       },
       "google": {
         "spend_base": 4823.71,
-        "spend_actual": 2801.18,
-        "spend_nom": -2022.54,
-        "spend_pct": -41.93,
+        "spend_actual": 4486.15,
+        "spend_nom": -337.57,
+        "spend_pct": -7.0,
         "purch_base": 1800.8,
-        "purch_actual": 945.5,
-        "purch_nom": -855.2,
-        "purch_pct": -47.49,
+        "purch_actual": 1771.0,
+        "purch_nom": -29.8,
+        "purch_pct": -1.65,
         "ses_base": 58850.2,
-        "ses_actual": 32894.0,
-        "ses_nom": -25956.2,
-        "ses_pct": -44.11,
-        "e_purch": 1.133,
-        "e_ses": 1.052,
-        "mc_purch": 2.3648,
-        "mc_ses": 0.077921
+        "ses_actual": 61329.0,
+        "ses_nom": 2478.8,
+        "ses_pct": 4.21,
+        "e_purch": 0.236,
+        "e_ses": -0.602,
+        "mc_purch": 11.3468,
+        "mc_ses": -0.136185
       },
       "meta": {
         "spend_base": 4783.21,
-        "spend_actual": 2919.0,
-        "spend_nom": -1864.21,
-        "spend_pct": -38.97,
+        "spend_actual": 5063.0,
+        "spend_nom": 279.79,
+        "spend_pct": 5.85,
         "purch_base": 30.8,
-        "purch_actual": 18.0,
-        "purch_nom": -12.8,
-        "purch_pct": -41.46,
+        "purch_actual": 34.0,
+        "purch_nom": 3.2,
+        "purch_pct": 10.57,
         "ses_base": 67897.2,
-        "ses_actual": 44478.5,
-        "ses_nom": -23418.8,
-        "ses_pct": -34.49,
-        "e_purch": 1.064,
-        "e_ses": 0.885,
-        "mc_purch": 146.2127,
-        "mc_ses": 0.079603
+        "ses_actual": 85184.0,
+        "ses_nom": 17286.8,
+        "ses_pct": 25.46,
+        "e_purch": 1.807,
+        "e_ses": 4.353,
+        "mc_purch": 86.0885,
+        "mc_ses": 0.016185
       },
       "organic": {
         "purch_base": 1401.8,
-        "purch_actual": 720.5,
-        "purch_nom": -681.2,
-        "purch_pct": -48.6
+        "purch_actual": 1378.0,
+        "purch_nom": -23.8,
+        "purch_pct": -1.69
       },
       "others": {
         "purch_base": 62.2,
-        "purch_actual": 26.0,
-        "purch_nom": -36.2,
-        "purch_pct": -58.23
+        "purch_actual": 50.0,
+        "purch_nom": -12.2,
+        "purch_pct": -19.68
       },
       "base_weeks": "W11–W14",
       "actual_weeks": "W15–W16"
@@ -378,7 +378,8 @@
         "W12",
         "W13",
         "W14",
-        "W15"
+        "W15",
+        "W16"
       ],
       "spend_google": [
         7316.0,
@@ -395,6 +396,7 @@
         2283.0,
         2519.9458,
         2821.1005586206898,
+        2515.9373862068965,
         2515.9373862068965
       ],
       "spend_meta": [
@@ -412,6 +414,7 @@
         2475.0,
         2438.27,
         3053.42,
+        3408.0,
         3408.0
       ],
       "spend_total": [
@@ -429,6 +432,7 @@
         4758.0,
         4958.2158,
         5874.520559,
+        5923.937386,
         5923.937386
       ],
       "purch_total": [
@@ -446,6 +450,7 @@
         2801,
         2766,
         2462,
+        2640,
         2640
       ],
       "purch_search": [
@@ -463,6 +468,7 @@
         794,
         1127,
         1110,
+        745,
         745
       ],
       "purch_pmax": [
@@ -480,6 +486,7 @@
         691,
         336,
         238,
+        661,
         661
       ],
       "purch_meta": [
@@ -497,6 +504,7 @@
         24,
         16,
         17,
+        25,
         25
       ],
       "purch_organic": [
@@ -514,6 +522,7 @@
         1235,
         1228,
         1054,
+        1164,
         1164
       ],
       "purch_others": [
@@ -531,6 +540,7 @@
         57,
         59,
         43,
+        45,
         45
       ],
       "ses_total": [
@@ -548,6 +558,7 @@
         179223,
         182833,
         203616,
+        236097,
         236097
       ],
       "ses_search": [
@@ -565,6 +576,7 @@
         18120,
         22514,
         25398,
+        20196,
         20196
       ],
       "ses_pmax": [
@@ -582,6 +594,7 @@
         25448,
         18588,
         19484,
+        27978,
         27978
       ],
       "ses_meta": [
@@ -599,6 +612,7 @@
         37608,
         45023,
         67880,
+        68948,
         68948
       ],
       "ses_organic": [
@@ -616,6 +630,7 @@
         93500,
         93141,
         87044,
+        105309,
         105309
       ],
       "ses_others": [
@@ -633,78 +648,79 @@
         4547,
         3567,
         3810,
+        13666,
         13666
       ]
     },
     "elas": {
       "total": {
-        "spend_base": 5404.55,
-        "spend_actual": 5899.23,
-        "spend_nom": 494.68,
-        "spend_pct": 9.15,
-        "purch_base": 2880.8,
-        "purch_actual": 2551.0,
-        "purch_nom": -329.8,
-        "purch_pct": -11.45,
-        "ses_base": 191573.2,
-        "ses_actual": 219856.5,
-        "ses_nom": 28283.2,
-        "ses_pct": 14.76,
-        "e_purch": -1.251,
-        "e_ses": 1.613,
-        "mc_purch": -1.5002,
-        "mc_ses": 0.01749
+        "spend_base": 5318.43,
+        "spend_actual": 5923.94,
+        "spend_nom": 605.5,
+        "spend_pct": 11.38,
+        "purch_base": 2716.8,
+        "purch_actual": 2640.0,
+        "purch_nom": -76.8,
+        "purch_pct": -2.83,
+        "ses_base": 191137.2,
+        "ses_actual": 236097.0,
+        "ses_nom": 44959.8,
+        "ses_pct": 23.52,
+        "e_purch": -0.248,
+        "e_ses": 2.066,
+        "mc_purch": -7.8893,
+        "mc_ses": 0.013468
       },
       "google": {
-        "spend_base": 2296.24,
-        "spend_actual": 2668.52,
-        "spend_nom": 372.28,
-        "spend_pct": 16.21,
-        "purch_base": 1548.5,
-        "purch_actual": 1377.0,
-        "purch_nom": -171.5,
-        "purch_pct": -11.08,
-        "ses_base": 44020.0,
-        "ses_actual": 46528.0,
-        "ses_nom": 2508.0,
-        "ses_pct": 5.7,
-        "e_purch": -0.683,
-        "e_ses": 0.351,
-        "mc_purch": -2.1707,
-        "mc_ses": 0.148438
+        "spend_base": 2425.76,
+        "spend_actual": 2515.94,
+        "spend_nom": 90.18,
+        "spend_pct": 3.72,
+        "purch_base": 1454.0,
+        "purch_actual": 1406.0,
+        "purch_nom": -48.0,
+        "purch_pct": -3.3,
+        "ses_base": 43611.0,
+        "ses_actual": 48174.0,
+        "ses_nom": 4563.0,
+        "ses_pct": 10.46,
+        "e_purch": -0.888,
+        "e_ses": 2.815,
+        "mc_purch": -1.8787,
+        "mc_ses": 0.019762
       },
       "meta": {
-        "spend_base": 3108.32,
-        "spend_actual": 3230.71,
-        "spend_nom": 122.39,
-        "spend_pct": 3.94,
-        "purch_base": 28.0,
-        "purch_actual": 21.0,
-        "purch_nom": -7.0,
-        "purch_pct": -25.0,
-        "ses_base": 49420.2,
-        "ses_actual": 68414.0,
-        "ses_nom": 18993.8,
-        "ses_pct": 38.43,
-        "e_purch": -6.349,
-        "e_ses": 9.761,
-        "mc_purch": -17.4846,
-        "mc_ses": 0.006444
+        "spend_base": 2892.67,
+        "spend_actual": 3408.0,
+        "spend_nom": 515.33,
+        "spend_pct": 17.81,
+        "purch_base": 24.2,
+        "purch_actual": 25.0,
+        "purch_nom": 0.8,
+        "purch_pct": 3.09,
+        "ses_base": 52360.0,
+        "ses_actual": 68948.0,
+        "ses_nom": 16588.0,
+        "ses_pct": 31.68,
+        "e_purch": 0.174,
+        "e_ses": 1.778,
+        "mc_purch": 687.1033,
+        "mc_ses": 0.031066
       },
       "organic": {
-        "purch_base": 1249.5,
-        "purch_actual": 1109.0,
-        "purch_nom": -140.5,
-        "purch_pct": -11.24
+        "purch_base": 1187.0,
+        "purch_actual": 1164.0,
+        "purch_nom": -23.0,
+        "purch_pct": -1.94
       },
       "others": {
-        "purch_base": 54.8,
-        "purch_actual": 44.0,
-        "purch_nom": -10.8,
-        "purch_pct": -19.63
+        "purch_base": 51.5,
+        "purch_actual": 45.0,
+        "purch_nom": -6.5,
+        "purch_pct": -12.62
       },
-      "base_weeks": "W10–W13",
-      "actual_weeks": "W14–W15"
+      "base_weeks": "W11–W14",
+      "actual_weeks": "W15–W16"
     }
   },
   "CL": {
@@ -1086,7 +1102,8 @@
         "W12",
         "W13",
         "W14",
-        "W15"
+        "W15",
+        "W16"
       ],
       "spend_google": [
         1693.213163688426,
@@ -1103,6 +1120,7 @@
         893.0,
         928.0,
         892.5724137931035,
+        854.0,
         854.0
       ],
       "spend_meta": [
@@ -1120,6 +1138,7 @@
         978.0,
         1000.0,
         963.0,
+        880.0,
         880.0
       ],
       "spend_total": [
@@ -1137,6 +1156,7 @@
         1871.0,
         1928.0,
         1855.572414,
+        1734.0,
         1734.0
       ],
       "purch_total": [
@@ -1154,6 +1174,7 @@
         421,
         342,
         235,
+        406,
         406
       ],
       "purch_search": [
@@ -1171,6 +1192,7 @@
         209,
         159,
         96,
+        199,
         199
       ],
       "purch_pmax": [
@@ -1188,6 +1210,7 @@
         59,
         55,
         34,
+        46,
         46
       ],
       "purch_meta": [
@@ -1205,6 +1228,7 @@
         5,
         1,
         4,
+        7,
         7
       ],
       "purch_organic": [
@@ -1222,6 +1246,7 @@
         144,
         122,
         99,
+        151,
         151
       ],
       "purch_others": [
@@ -1239,6 +1264,7 @@
         4,
         5,
         2,
+        3,
         3
       ],
       "ses_total": [
@@ -1256,6 +1282,7 @@
         32174,
         33699,
         30714,
+        32267,
         32267
       ],
       "ses_search": [
@@ -1273,6 +1300,7 @@
         5304,
         4408,
         3763,
+        4807,
         4807
       ],
       "ses_pmax": [
@@ -1290,6 +1318,7 @@
         5471,
         5230,
         5402,
+        3889,
         3889
       ],
       "ses_meta": [
@@ -1307,6 +1336,7 @@
         9039,
         12892,
         12577,
+        12463,
         12463
       ],
       "ses_organic": [
@@ -1324,6 +1354,7 @@
         11961,
         10894,
         8704,
+        10769,
         10769
       ],
       "ses_others": [
@@ -1341,78 +1372,79 @@
         399,
         275,
         268,
+        339,
         339
       ]
     },
     "elas": {
       "total": {
-        "spend_base": 1921.49,
-        "spend_actual": 1794.79,
-        "spend_nom": -126.7,
-        "spend_pct": -6.59,
-        "purch_base": 401.0,
-        "purch_actual": 320.5,
-        "purch_nom": -80.5,
-        "purch_pct": -20.07,
-        "ses_base": 33178.2,
-        "ses_actual": 31490.5,
-        "ses_nom": -1687.8,
-        "ses_pct": -5.09,
-        "e_purch": 3.044,
-        "e_ses": 0.771,
-        "mc_purch": 1.574,
-        "mc_ses": 0.075072
+        "spend_base": 1922.02,
+        "spend_actual": 1734.0,
+        "spend_nom": -188.02,
+        "spend_pct": -9.78,
+        "purch_base": 358.8,
+        "purch_actual": 406.0,
+        "purch_nom": 47.2,
+        "purch_pct": 13.17,
+        "ses_base": 33202.5,
+        "ses_actual": 32267.0,
+        "ses_nom": -935.5,
+        "ses_pct": -2.82,
+        "e_purch": -1.346,
+        "e_ses": 0.288,
+        "mc_purch": -3.9793,
+        "mc_ses": 0.200984
       },
       "google": {
-        "spend_base": 944.49,
-        "spend_actual": 873.29,
-        "spend_nom": -71.2,
-        "spend_pct": -7.54,
-        "purch_base": 247.0,
-        "purch_actual": 187.5,
-        "purch_nom": -59.5,
-        "purch_pct": -24.09,
-        "ses_base": 10978.2,
-        "ses_actual": 8930.5,
-        "ses_nom": -2047.8,
-        "ses_pct": -18.65,
-        "e_purch": 3.195,
-        "e_ses": 2.474,
-        "mc_purch": 1.1967,
-        "mc_ses": 0.034772
+        "spend_base": 945.52,
+        "spend_actual": 854.0,
+        "spend_nom": -91.52,
+        "spend_pct": -9.68,
+        "purch_base": 218.2,
+        "purch_actual": 245.0,
+        "purch_nom": 26.8,
+        "purch_pct": 12.26,
+        "ses_base": 10321.2,
+        "ses_actual": 8696.0,
+        "ses_nom": -1625.2,
+        "ses_pct": -15.75,
+        "e_purch": -1.266,
+        "e_ses": 1.627,
+        "mc_purch": -3.4213,
+        "mc_ses": 0.056312
       },
       "meta": {
-        "spend_base": 977.0,
-        "spend_actual": 921.5,
-        "spend_nom": -55.5,
-        "spend_pct": -5.68,
-        "purch_base": 4.8,
-        "purch_actual": 5.5,
-        "purch_nom": 0.8,
-        "purch_pct": 15.79,
-        "ses_base": 10060.5,
-        "ses_actual": 12520.0,
-        "ses_nom": 2459.5,
-        "ses_pct": 24.45,
-        "e_purch": -2.78,
-        "e_ses": -4.304,
-        "mc_purch": -74.0,
-        "mc_ses": -0.022566
+        "spend_base": 976.5,
+        "spend_actual": 880.0,
+        "spend_nom": -96.5,
+        "spend_pct": -9.88,
+        "purch_base": 3.8,
+        "purch_actual": 7.0,
+        "purch_nom": 3.2,
+        "purch_pct": 86.67,
+        "ses_base": 11616.0,
+        "ses_actual": 12463.0,
+        "ses_nom": 847.0,
+        "ses_pct": 7.29,
+        "e_purch": -8.77,
+        "e_ses": -0.738,
+        "mc_purch": -29.6923,
+        "mc_ses": -0.113932
       },
       "organic": {
-        "purch_base": 143.2,
-        "purch_actual": 125.0,
-        "purch_nom": -18.2,
-        "purch_pct": -12.74
+        "purch_base": 132.2,
+        "purch_actual": 151.0,
+        "purch_nom": 18.8,
+        "purch_pct": 14.18
       },
       "others": {
-        "purch_base": 6.0,
-        "purch_actual": 2.5,
-        "purch_nom": -3.5,
-        "purch_pct": -58.33
+        "purch_base": 4.5,
+        "purch_actual": 3.0,
+        "purch_nom": -1.5,
+        "purch_pct": -33.33
       },
-      "base_weeks": "W10–W13",
-      "actual_weeks": "W14–W15"
+      "base_weeks": "W11–W14",
+      "actual_weeks": "W15–W16"
     }
   }
 }
