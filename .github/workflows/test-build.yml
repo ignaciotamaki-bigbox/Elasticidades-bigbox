@@ -1,0 +1,58 @@
+name: Test Build Full
+
+# Corre build.py contra los 3 Excels en Drive y sube el data.json como artifact.
+# Trigger manual desde la pestaña Actions.
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Write credentials.json from secret
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        run: |
+          if [ -z "$GOOGLE_CREDENTIALS" ]; then
+            echo "ERROR: el secret GOOGLE_CREDENTIALS está vacío."
+            exit 1
+          fi
+          echo "$GOOGLE_CREDENTIALS" > credentials.json
+
+      - name: Run build.py
+        env:
+          FILE_ID_AR: ${{ secrets.FILE_ID_AR }}
+          FILE_ID_CL: ${{ secrets.FILE_ID_CL }}
+          FILE_ID_UY: ${{ secrets.FILE_ID_UY }}
+        run: python build.py --output data.json
+
+      - name: Show data.json summary
+        run: |
+          echo "Tamaño de data.json:"
+          wc -c data.json
+          echo ""
+          echo "Estructura (top-level keys):"
+          python -c "import json; d=json.load(open('data.json')); [print(f'  {k}: {len(d[k][\"evo\"][\"weeks\"])} semanas, ventanas {d[k][\"elas\"][\"base_weeks\"]} / {d[k][\"elas\"][\"actual_weeks\"]}') for k in d]"
+
+      - name: Upload data.json as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-json
+          path: data.json
+          retention-days: 7
+
+      - name: Cleanup credentials
+        if: always()
+        run: rm -f credentials.json
