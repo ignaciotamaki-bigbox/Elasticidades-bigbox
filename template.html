@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elasticidades — Bigbox</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap');
+        :root {
+            --bg: #f7f7f8; --card: #fff; --border: #ebebeb;
+            --text: #18181b; --muted: #6b7280; --black: #18181b;
+            --up: #0d9488;     --up-bg: #f0fdfa;     --up-border: #ccfbf1;
+            --down: #e11d48;   --down-bg: #fff1f2;   --down-border: #ffe4e6;
+            --neutral-bg: #f4f4f5; --neutral-text: #52525b;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'DM Sans',-apple-system,sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; }
+
+        /* NAVBAR */
+        .navbar {
+            background:var(--black); height:56px; padding:0 32px;
+            display:flex; align-items:baseline; justify-content:space-between;
+            padding-top:18px;
+            position:sticky; top:0; z-index:100;
+        }
+        .logo { font-size:22px; font-weight:700; color:#fff; letter-spacing:-0.5px; }
+        .logo span {
+            font-weight:500; margin-left:6px; font-size:17px;
+            background: linear-gradient(110deg, #71717a 0%, #d4d4d8 28%, #a1a1aa 48%, #e4e4e7 65%, #71717a 100%);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .nav-sub { font-size:12px; color:rgba(255,255,255,0.35); font-weight:500; letter-spacing:.3px; }
+
+        .back-btn {
+            background:none; border:none; color:rgba(255,255,255,0.65);
+            font-size:13px; font-weight:500; cursor:pointer; font-family:inherit;
+            display:flex; align-items:center; gap:6px; padding:6px 0;
+            transition:color 0.15s;
+        }
+        .back-btn:hover { color:#fff; }
+        .back-btn svg { width:16px; height:16px; }
+
+        /* TAB BAR */
+        .tab-bar {
+            background:#fff; border-bottom:1px solid var(--border);
+            position:sticky; top:56px; z-index:99;
+        }
+        .tab-bar-inner {
+            max-width:1280px; margin:0 auto; padding:0 24px;
+            display:flex; gap:0;
+        }
+        .tab-btn {
+            padding:14px 20px; font-size:13px; font-weight:600;
+            color:var(--muted); background:none; border:none;
+            border-bottom:2px solid transparent; cursor:pointer;
+            font-family:inherit; letter-spacing:-0.1px;
+            transition:color 0.15s, border-color 0.15s;
+        }
+        .tab-btn.active { color:var(--text); border-bottom-color:var(--black); }
+        .tab-btn:hover  { color:var(--text); }
+
+        .tab-content { display:none; }
+        .tab-content.active { display:block; }
+
+        .container { max-width:1280px; margin:0 auto; padding:32px 24px; }
+        .page-header { margin-bottom:36px; }
+        .page-header h1 { font-family:'Outfit',sans-serif; font-size:24px; font-weight:700; letter-spacing:-0.5px; }
+        .page-header p { color:var(--muted); font-size:13px; margin-top:6px; line-height:1.7; }
+
+        /* Page metadata chips */
+        .page-meta { display:flex; flex-wrap:wrap; gap:7px; margin-top:14px; align-items:center; }
+        .meta-chip {
+            display:inline-flex; align-items:center; gap:5px;
+            font-size:11px; font-weight:500; color:var(--muted);
+            background:#fafafa; border:1px solid var(--border);
+            border-radius:6px; padding:4px 11px; white-space:nowrap;
+            line-height:1.4;
+        }
+        .meta-chip b { color:var(--text); font-weight:700; font-size:11px; }
+        .meta-chip-dark { background:var(--neutral-bg); }
+        .meta-chip-sep { width:1px; height:14px; background:var(--border); margin:0 2px; }
+
+        .section { margin-bottom:44px; }
+        .section-head {
+            display:flex; align-items:baseline; gap:10px;
+            margin-bottom:14px; padding-bottom:10px; border-bottom:2px solid var(--black);
+        }
+        .section-head h2 { font-size:16px; font-weight:700; letter-spacing:-0.2px; }
+
+        /* TABLE */
+        .table-wrap { background:var(--card); border-radius:10px; border:1px solid var(--border); overflow-x:auto; }
+        table { width:100%; border-collapse:collapse; }
+        thead th {
+            padding:11px 10px; text-align:center;
+            font-size:10px; text-transform:uppercase; letter-spacing:.7px;
+            color:var(--muted); font-weight:600; border-bottom:1px solid var(--border);
+            white-space:nowrap; background:#fafafa;
+        }
+        thead th:first-child { text-align:left; padding-left:18px; width:155px; }
+        thead th.col-sep, tbody td.col-sep { border-left:2px solid #e4e4e7; }
+        tbody tr { border-bottom:1px solid var(--border); }
+        tbody tr:last-child { border-bottom:none; }
+        tbody td { padding:12px 10px; text-align:center; vertical-align:middle; font-size:13px; }
+        tbody td:first-child { text-align:left; padding-left:18px; }
+        .lbl { font-weight:600; color:var(--text); font-size:12px; }
+        .lbl-sub { display:block; font-weight:400; color:var(--muted); font-size:11px; margin-top:1px; }
+        .lbl-muted { font-weight:500; color:var(--muted); font-size:12px; }
+        .row-sep-line td { border-bottom:2px solid var(--border); padding:0; height:0; }
+        .row-result td { background:#ebebed; border-top:1px solid #dddde0; }
+        .row-result:last-child td:first-child { border-bottom-left-radius:10px; }
+        .row-result:last-child td:last-child  { border-bottom-right-radius:10px; }
+        .row-nom td { background:var(--neutral-bg); }
+        .num { font-weight:600; font-size:13px; color:var(--text); font-variant-numeric:tabular-nums; }
+        .dash { color:var(--muted); font-size:16px; font-weight:300; }
+        .nom-val { font-weight:600; font-size:13px; color:#52525b; font-variant-numeric:tabular-nums; }
+        .mc-val  { font-weight:700; font-size:13px; color:var(--text); font-variant-numeric:tabular-nums; }
+        .pill {
+            display:inline-flex; align-items:center; gap:4px;
+            font-size:12px; font-weight:600; padding:4px 10px; border-radius:6px;
+            font-variant-numeric:tabular-nums;
+        }
+        .pill-up   { background:var(--up-bg);   color:var(--up);   border:1px solid var(--up-border);   }
+        .pill-down { background:var(--down-bg); color:var(--down); border:1px solid var(--down-border); }
+        .pill-arrow { font-size:10px; }
+        .epill {
+            display:inline-block; font-size:13px; font-weight:700;
+            padding:4px 10px; border-radius:6px; font-variant-numeric:tabular-nums; min-width:52px;
+        }
+        .e-neutral { background:var(--neutral-bg); color:var(--neutral-text); border:1px solid #e4e4e7; }
+        .e-good    { background:var(--up-bg);      color:var(--up);           border:1px solid var(--up-border); }
+        .e-bad     { background:var(--down-bg);    color:var(--down);         border:1px solid var(--down-border); }
+        .ch { display:inline-block; padding:3px 9px; border-radius:5px; font-size:10px; font-weight:600; letter-spacing:.3px; }
+        .ch-total   { background:#f4f4f5; color:#52525b; }
+        .ch-search  { background:#fef3c7; color:#92400e; }
+        .ch-pmax    { background:#e0f2fe; color:#075985; }
+        .ch-meta    { background:#ede9fe; color:#5b21b6; }
+        .ch-organic { background:#f0fdf4; color:#15803d; }
+        .ch-others  { background:#f4f4f5; color:#71717a; }
+        .footnote {
+            font-size:12px; color:var(--muted); line-height:1.8;
+            padding:20px 24px; background:var(--card);
+            border-radius:10px; border:1px solid var(--border); margin-top:36px;
+        }
+        .footnote strong { color:var(--text); }
+        .dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:2px; vertical-align:middle; }
+        .dot-up { background:var(--up); } .dot-down { background:var(--down); }
+
+        /* CHARTS */
+        .chart-section { margin-bottom:48px; }
+        .chart-section-head { display:flex; align-items:baseline; gap:10px; margin-bottom:16px; padding-bottom:10px; border-bottom:2px solid var(--black); }
+        .chart-section-head h2 { font-size:16px; font-weight:700; letter-spacing:-0.2px; }
+        .chart-section-head span { font-size:12px; color:var(--muted); }
+        .chart-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+        .chart-card { background:var(--card); border-radius:10px; border:1px solid var(--border); padding:20px 20px 16px; }
+        .chart-card-title { font-size:13px; font-weight:700; letter-spacing:-0.2px; margin-bottom:4px; }
+        .chart-card-sub   { font-size:11px; color:var(--muted); margin-bottom:16px; }
+        .chart-canvas-wrap { position:relative; height:240px; }
+        .chart-stat-bar { display:flex; gap:32px; align-items:center; padding-top:14px; margin-top:12px; border-top:1px solid var(--border); }
+        .chart-stat { display:flex; flex-direction:column; gap:2px; }
+        .chart-stat-label { font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); font-weight:600; }
+        .chart-stat-value { font-size:20px; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; letter-spacing:-0.5px; }
+        .chart-stat-unit { font-size:11px; font-weight:400; color:var(--muted); margin-left:2px; }
+
+        /* ── LOGO clickable ── */
+        .logo-link { cursor:pointer; transition:opacity 0.15s; user-select:none; }
+        .logo-link:hover { opacity:0.85; }
+
+        /* ── BACK BUTTON (styled pill) ── */
+        .home-btn {
+            display:inline-flex; align-items:center; gap:6px;
+            background:#18181b; color:#fff; border:none;
+            font-family:inherit; font-size:12px; font-weight:600; letter-spacing:.2px;
+            padding:7px 14px 7px 11px; border-radius:999px;
+            cursor:pointer; transition:background 0.15s, transform 0.1s;
+            margin-right:18px;
+        }
+        .home-btn:hover { background:#3f3f46; }
+        .home-btn:active { transform:scale(0.97); }
+        .home-btn svg { width:14px; height:14px; stroke:currentColor; stroke-width:2.2; fill:none; }
+
+        /* Breadcrumb shown in tab bar */
+        .crumb {
+            font-size:12px; color:var(--muted); font-weight:500;
+            display:flex; align-items:center; gap:6px; margin-right:20px; padding-left:4px;
+            border-left:1px solid var(--border); padding-left:16px;
+        }
+        .crumb-sep { color:#d4d4d8; font-weight:400; }
+        .crumb-current { color:var(--text); font-weight:600; }
+
+        /* ── HOME ── */
+        #view-home { display:block; background:linear-gradient(180deg,#fafafa 0%,var(--bg) 400px); min-height:calc(100vh - 52px); }
+        #view-country { display:none; }
+
+        .home-hero {
+            max-width:1240px; margin:0 auto; padding:56px 28px 4px;
+        }
+        .home-eyebrow {
+            display:inline-flex; align-items:center; gap:8px;
+            font-size:10px; font-weight:700; letter-spacing:1.6px;
+            color:var(--muted); text-transform:uppercase;
+            margin-bottom:18px; padding:5px 10px 5px 10px;
+            border:1px solid var(--border); border-radius:999px;
+            background:#fff;
+        }
+        .home-hero h1 { font-family:'Outfit',sans-serif; font-size:44px; font-weight:800; letter-spacing:-1.5px; line-height:1.05; margin-bottom:14px; }
+        .home-hero h1 em { font-style:normal; color:#52525b; }
+        .home-hero-lead { color:var(--muted); font-size:15px; line-height:1.65; max-width:620px; }
+        .home-hero-meta {
+            display:flex; flex-wrap:wrap; gap:18px 28px; margin-top:24px;
+            font-size:12px; color:var(--muted); font-weight:500;
+        }
+        .home-hero-meta div { display:flex; align-items:center; gap:6px; }
+        .home-hero-meta strong { color:var(--text); font-weight:700; }
+        .hero-dot { width:6px; height:6px; border-radius:50%; background:var(--up); display:inline-block; }
+
+        /* Featured TOTAL card */
+        .home-container { max-width:1240px; margin:0 auto; padding:14px 28px 64px; }
+
+        .section-label {
+            font-size:10px; font-weight:700; letter-spacing:1.4px;
+            color:var(--muted); text-transform:uppercase;
+            margin:36px 0 16px; display:flex; align-items:center; gap:10px;
+        }
+        .section-label::after { content:""; flex:1; height:1px; background:var(--border); }
+
+        .total-card {
+            background:linear-gradient(135deg,#18181b 0%,#27272a 100%);
+            color:#fff; border-radius:18px; padding:32px 36px;
+            cursor:pointer; position:relative; overflow:hidden;
+            transition:transform 0.18s, box-shadow 0.18s;
+            display:grid; grid-template-columns:1.2fr 2.4fr auto; gap:36px; align-items:center;
+            border: 1px solid transparent;
+            background-clip: padding-box;
+            box-shadow: 0 0 0 1px rgba(212,212,216,0.18), inset 0 1px 0 rgba(228,228,231,0.12);
+        }
+        .total-card::after {
+            content:""; position:absolute; inset:0; border-radius:18px; pointer-events:none;
+            background: linear-gradient(135deg, rgba(228,228,231,0.07) 0%, transparent 45%, rgba(161,161,170,0.06) 100%);
+        }
+        .total-card:hover { transform:translateY(-2px); box-shadow:0 20px 50px rgba(0,0,0,0.35), 0 0 0 1px rgba(212,212,216,0.25); }
+        .total-card::before {
+            content:""; position:absolute; top:-60px; right:-60px;
+            width:280px; height:280px; border-radius:50%;
+            background:radial-gradient(circle,rgba(13,148,136,0.22) 0%,transparent 65%);
+            pointer-events:none;
+        }
+        .total-card-left { position:relative; z-index:1; }
+        .total-flag-badge {
+            font-family:'Outfit',sans-serif; font-size:13px; font-weight:700; letter-spacing:1.5px;
+            display:inline-block; margin-bottom:14px;
+            background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.9);
+            border:1px solid rgba(255,255,255,0.2); border-radius:6px;
+            padding:5px 10px;
+        }
+        .total-name { font-family:'Outfit',sans-serif; font-size:26px; font-weight:800; letter-spacing:-0.8px; margin-bottom:4px; }
+        .total-sub  { font-size:13px; color:rgba(255,255,255,0.6); font-weight:500; }
+        .total-stats {
+            display:grid; grid-template-columns:repeat(3,1fr); gap:22px;
+            position:relative; z-index:1;
+        }
+        .total-stat-label { font-size:10px; text-transform:uppercase; letter-spacing:.8px; color:rgba(255,255,255,0.55); font-weight:600; margin-bottom:6px; }
+        .total-stat-val   {
+            font-size:22px; font-weight:700; letter-spacing:-0.4px; font-variant-numeric:tabular-nums; line-height:1.1; margin-bottom:4px;
+            background: linear-gradient(160deg, #ffffff 30%, #d4d4d8 60%, #f4f4f5 100%);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .total-stat-delta { font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:3px; padding:2px 7px; border-radius:4px; }
+        .tstat-up   { background:rgba(13,148,136,0.25);  color:#5eead4; }
+        .tstat-down { background:rgba(225,29,72,0.25);   color:#fda4af; }
+        .total-cta {
+            background:#fff; color:#18181b; border-radius:50%;
+            width:52px; height:52px; display:flex; align-items:center; justify-content:center;
+            font-size:22px; font-weight:700; transition:transform 0.15s;
+            position:relative; z-index:1;
+        }
+        .total-card:hover .total-cta { transform:translateX(3px); }
+
+        /* Country cards */
+        .country-grid {
+            display:grid; grid-template-columns:repeat(3,1fr); gap:20px;
+        }
+        .country-card {
+            background:var(--card); border:1px solid var(--border); border-radius:16px;
+            padding:0; cursor:pointer;
+            transition:box-shadow 0.2s, transform 0.15s, border-color 0.15s;
+            position:relative; overflow:hidden;
+            display:flex; flex-direction:column;
+        }
+        .country-card:hover { box-shadow:0 12px 36px rgba(0,0,0,0.1); transform:translateY(-3px); border-color:#d1d5db; }
+        .country-card-top {
+            padding:20px 22px 16px;
+            border-bottom:1px solid var(--border);
+            display:flex; align-items:center; gap:14px;
+        }
+        .country-ident { display:flex; align-items:center; gap:14px; }
+        .country-flag-box {
+            width:42px; height:42px; border-radius:10px;
+            display:flex; align-items:center; justify-content:center;
+            flex-shrink:0;
+            font-family:'Outfit',sans-serif; font-size:12px; font-weight:700;
+            letter-spacing:1px;
+        }
+        .country-name-box { line-height:1.25; }
+        .country-name-box h3 { font-family:'Outfit',sans-serif; font-size:16px; font-weight:700; letter-spacing:-0.4px; }
+        .country-name-box span { font-size:11px; color:var(--muted); font-weight:500; }
+
+        .country-card-body {
+            padding:16px 22px 18px; display:flex; flex-direction:column; gap:11px; flex:1;
+        }
+        .ckpi { display:flex; align-items:center; justify-content:space-between; }
+        .ckpi-label { font-size:11px; color:var(--muted); font-weight:500; text-transform:uppercase; letter-spacing:.4px; }
+        .ckpi-right { display:flex; align-items:center; gap:8px; }
+        .ckpi-val { font-size:14px; font-weight:700; font-variant-numeric:tabular-nums; }
+        .ckpi-pct { font-size:11px; font-weight:600; padding:3px 8px; border-radius:5px; font-variant-numeric:tabular-nums; letter-spacing:0; }
+        .kpi-up   { background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0; }
+        .kpi-down { background:#fef2f2; color:#dc2626; border:1px solid #fecaca; }
+
+        .country-card-foot {
+            padding:14px 24px; background:#fafafa;
+            border-top:1px solid var(--border);
+            display:flex; align-items:center; justify-content:space-between;
+            font-size:12px; font-weight:600; color:var(--muted);
+            transition:background 0.15s, color 0.15s;
+        }
+        .country-card:hover .country-card-foot { background:#18181b; color:#fff; }
+        .country-card-foot .arrow { font-size:15px; transition:transform 0.2s; }
+        .country-card:hover .country-card-foot .arrow { transform:translateX(4px); }
+
+        /* Home footer note */
+        .home-foot {
+            margin-top:40px; padding:20px 24px; background:var(--card);
+            border-radius:10px; border:1px solid var(--border);
+            font-size:12px; color:var(--muted); line-height:1.8;
+        }
+        .home-foot strong { color:var(--text); }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeUp {
+            from { opacity:0; transform:translateY(18px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity:0; }
+            to   { opacity:1; }
+        }
+        .home-hero { animation: fadeIn 0.4s ease both; }
+        .total-card { animation: fadeUp 0.45s ease both; animation-delay: 0.05s; }
+        .country-card:nth-child(1) { animation: fadeUp 0.45s ease both; animation-delay: 0.12s; }
+        .country-card:nth-child(2) { animation: fadeUp 0.45s ease both; animation-delay: 0.20s; }
+        .country-card:nth-child(3) { animation: fadeUp 0.45s ease both; animation-delay: 0.28s; }
+
+        @media (max-width:900px) {
+            .country-grid { grid-template-columns:1fr 1fr; }
+            .total-card { grid-template-columns:1fr; gap:24px; padding:28px; }
+            .total-stats { grid-template-columns:repeat(2,1fr); }
+            .total-cta { position:absolute; top:28px; right:28px; width:42px; height:42px; }
+        }
+        @media (max-width:550px) {
+            .country-grid { grid-template-columns:1fr; }
+            .home-hero h1 { font-size:30px; }
+        }
+        @media (max-width:800px) { .chart-grid { grid-template-columns:1fr; } }
+        @media print { .navbar { position:static; } .table-wrap { break-inside:avoid; } }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div id="nav-logo" class="logo logo-link" onclick="goHome()">Bigbox<span>Elasticidades</span></div>
+    <div class="nav-sub" id="nav-sub">LatAm · 2026</div>
+</nav>
+
+<!-- ════════════════════════════════════════════ -->
+<!--  HOME                                        -->
+<!-- ════════════════════════════════════════════ -->
+<div id="view-home">
+    <div class="home-hero">
+        <div class="home-eyebrow">LatAm · Marketing Performance · 2026</div>
+        <h1>Elasticidades <em>Spend → Resultados</em></h1>
+        <div class="home-hero-meta">
+            <div>Actualizado: <strong id="home-date">—</strong></div>
+        </div>
+    </div>
+
+    <div class="home-container">
+        <div class="section-label">Consolidado regional</div>
+        <div id="total-card-slot"><!-- total card injected by JS --></div>
+
+        <div class="section-label">Por país</div>
+        <div class="country-grid" id="country-grid">
+            <!-- Country cards injected by JS -->
+        </div>
+
+        <div class="home-foot">
+            <strong>Click en cualquier tarjeta</strong> para ver el análisis detallado: elasticidades por canal, evolución semanal de CPA/CPS y CVR.
+        </div>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!--  COUNTRY VIEW                                -->
+<!-- ════════════════════════════════════════════ -->
+<div id="view-country" style="display:none">
+    <div class="tab-bar">
+        <div class="tab-bar-inner" style="align-items:center">
+            <button class="home-btn" id="back-btn" onclick="goHome()" title="Volver al inicio">
+                <svg viewBox="0 0 16 16"><path d="M2 7L8 2l6 5v7a1 1 0 01-1 1h-3v-4H7v4H3a1 1 0 01-1-1V7z"/></svg>
+                Inicio
+            </button>
+            <button class="tab-btn active" data-tab="elasticidades">Elasticidades</button>
+            <button class="tab-btn"        data-tab="evolucion">Evolución CPA y CPS</button>
+            <button class="tab-btn"        data-tab="cvr">Evolución CVR</button>
+        </div>
+    </div>
+
+    <!-- TAB 1: ELASTICIDADES -->
+    <div id="tab-elasticidades" class="tab-content active">
+    <div class="container">
+        <div class="page-header">
+            <h1 id="elas-title">Elasticidades: Spend vs Resultados</h1>
+            <div id="elas-sub"></div>
+        </div>
+        <!-- PURCHASES -->
+        <div class="section">
+            <div class="section-head"><h2>Spend → Purchases</h2></div>
+            <div class="table-wrap"><table>
+                <thead><tr>
+                    <th></th>
+                    <th><span class="ch ch-total">TOTAL</span></th>
+                    <th><span class="ch ch-search">GOOGLE</span></th>
+                    <th><span class="ch ch-meta">META</span></th>
+                    <th class="col-sep"><span class="ch ch-organic">ORGANIC</span></th>
+                    <th><span class="ch ch-others">OTHERS</span></th>
+                </tr></thead>
+                <tbody>
+                <tr><td><span class="lbl-muted">Spend base (prom/sem)</span></td>
+                    <td class="num" id="t-ps-sb-total"></td><td class="num" id="t-ps-sb-google"></td><td class="num" id="t-ps-sb-meta"></td>
+                    <td class="col-sep"><span class="dash">—</span></td><td><span class="dash">—</span></td></tr>
+                <tr><td><span class="lbl-muted">Spend actual (prom/sem)</span></td>
+                    <td class="num" id="t-ps-sa-total"></td><td class="num" id="t-ps-sa-google"></td><td class="num" id="t-ps-sa-meta"></td>
+                    <td class="col-sep"><span class="dash">—</span></td><td><span class="dash">—</span></td></tr>
+                <tr class="row-nom"><td><span class="lbl">Δ Spend</span></td>
+                    <td id="t-ps-sn-total"></td><td id="t-ps-sn-google"></td><td id="t-ps-sn-meta"></td>
+                    <td class="col-sep"><span class="dash">—</span></td><td><span class="dash">—</span></td></tr>
+                <tr><td><span class="lbl">%Δ Spend</span></td>
+                    <td id="t-ps-sp-total"></td><td id="t-ps-sp-google"></td><td id="t-ps-sp-meta"></td>
+                    <td class="col-sep"><span class="dash">—</span></td><td><span class="dash">—</span></td></tr>
+                <tr class="row-sep-line"><td colspan="6"></td></tr>
+                <tr><td><span class="lbl-muted">Purchases base (prom/sem)</span></td>
+                    <td class="num" id="t-ps-pb-total"></td><td class="num" id="t-ps-pb-google"></td><td class="num" id="t-ps-pb-meta"></td>
+                    <td class="col-sep num" id="t-ps-pb-organic"></td><td class="num" id="t-ps-pb-others"></td></tr>
+                <tr><td><span class="lbl-muted">Purchases actual (prom/sem)</span></td>
+                    <td class="num" id="t-ps-pa-total"></td><td class="num" id="t-ps-pa-google"></td><td class="num" id="t-ps-pa-meta"></td>
+                    <td class="col-sep num" id="t-ps-pa-organic"></td><td class="num" id="t-ps-pa-others"></td></tr>
+                <tr class="row-nom"><td><span class="lbl">Δ Purchases</span></td>
+                    <td id="t-ps-pn-total"></td><td id="t-ps-pn-google"></td><td id="t-ps-pn-meta"></td>
+                    <td class="col-sep" id="t-ps-pn-organic"></td><td id="t-ps-pn-others"></td></tr>
+                <tr><td><span class="lbl">%Δ Purchases</span></td>
+                    <td id="t-ps-pp-total"></td><td id="t-ps-pp-google"></td><td id="t-ps-pp-meta"></td>
+                    <td class="col-sep" id="t-ps-pp-organic"></td><td id="t-ps-pp-others"></td></tr>
+                <tr class="row-sep-line"><td colspan="6"></td></tr>
+                <tr class="row-result"><td><span class="lbl" style="font-size:13px">Elasticidad</span></td>
+                    <td id="t-ps-e-total"></td><td id="t-ps-e-google"></td><td id="t-ps-e-meta"></td>
+                    <td class="col-sep"><span class="dash">—</span></td><td><span class="dash">—</span></td></tr>
+                <tr class="row-result"><td><span class="lbl" style="font-size:13px">Costo Marginal</span><span class="lbl-sub">USD / compra adicional</span></td>
+                    <td id="t-ps-mc-total"></td><td id="t-ps-mc-google"></td><td id="t-ps-mc-meta"></td>
+                    <td class="col-sep"><span class="dash">—</span></td><td><span class="dash">—</span></td></tr>
+                </tbody>
+            </table></div>
+        </div>
+        <!-- SESIONES -->
+        <div class="section">
+            <div class="section-head"><h2>Spend → Sesiones</h2></div>
+            <div class="table-wrap"><table>
+                <thead><tr>
+                    <th></th>
+                    <th><span class="ch ch-total">TOTAL</span></th>
+                    <th><span class="ch ch-search">GOOGLE</span></th>
+                    <th><span class="ch ch-meta">META</span></th>
+                    <th class="col-sep"><span class="ch ch-organic">ORGANIC</span></th>
+                    <th><span class="ch ch-others">OTHERS</span></th>
+                </tr></thead>
+                <tbody>
+                <tr><td><span class="lbl-muted">Spend base (prom/sem)</span></td>
+                    <td class="num" id="t-ss-sb-total"></td><td class="num" id="t-ss-sb-google"></td><td class="num" id="t-ss-sb-meta"></td>
+                    <td class="col-sep"><span class="dash">—</span></td><td><span class="dash">—</span></td></tr>
+                <tr><td><span class="lbl-muted">Spend actual (prom/sem)</span></td>
+                    <td class="num" id="t-ss-sa-total"></td><td class="num" id="t-ss-sa-google"></td><td class="num" id="t-ss-sa-meta"></td>
+                    <td class="col-sep"><span class="dash">—</span></td><td><span class="dash">—</span></td></tr>
+                <tr class="row-nom"><td><span class="lbl">Δ Spend</span></td>
+                    <td id="t-ss-sn-total"></td><td id="t-ss-sn-google"></td><td id="t-ss-sn-meta"></td>
+                    <td class="col-sep"><span class="dash">—</span></td><td><span class="dash">—</span></td></tr>
+                <tr><td><span class="lbl">%Δ Spend</span></td>
+                    <td id="t-ss-sp-total"></td><td id="t-ss-sp-google"></td><td id="t-ss-sp-meta"></td>
+                    <td class="col-sep"><span class="dash">—</span></td><td><span class="dash">—</span></td></tr>
+                <tr class="row-sep-line"><td colspan="6"></td></tr>
+                <tr><td><span class="lbl-muted">Sesiones base (prom/sem)</span></td>
+                    <td class="num" id="t-ss-sesb-total"></td><td class="num" id="t-ss-sesb-google"></td><td class="num" id="t-ss-sesb-meta"></td>
+                    <td class="col-sep num" id="t-ss-sesb-organic"></td><td class="num" id="t-ss-sesb-others"></td></tr>
+                <tr><td><span class="lbl-muted">Sesiones actual (prom/sem)</span></td>
+                    <td class="num" id="t-ss-sesa-total"></td><td class="num" id="t-ss-sesa-google"></td><td class="num" id="t-ss-sesa-meta"></td>
+                    <td class="col-sep num" id="t-ss-sesa-organic"></td><td class="num" id="t-ss-sesa-others"></td></tr>
+                <tr class="row-nom"><td><span class="lbl">Δ Sesiones</span></td>
+                    <td id="t-ss-sn2-total"></td><td id="t-ss-sn2-google"></td><td id="t-ss-sn2-meta"></td>
+                    <td class="col-sep" id="t-ss-sn2-organic"></td><td id="t-ss-sn2-others"></td></tr>
+                <tr><td><span class="lbl">%Δ Sesiones</span></td>
+                    <td id="t-ss-sp2-total"></td><td id="t-ss-sp2-google"></td><td id="t-ss-sp2-meta"></td>
+                    <td class="col-sep" id="t-ss-sp2-organic"></td><td id="t-ss-sp2-others"></td></tr>
+                <tr class="row-sep-line"><td colspan="6"></td></tr>
+                <tr class="row-result"><td><span class="lbl" style="font-size:13px">Elasticidad</span></td>
+                    <td id="t-ss-e-total"></td><td id="t-ss-e-google"></td><td id="t-ss-e-meta"></td>
+                    <td class="col-sep"><span class="dash">—</span></td><td><span class="dash">—</span></td></tr>
+                <tr class="row-result"><td><span class="lbl" style="font-size:13px">Costo Marginal</span><span class="lbl-sub">USD / sesión adicional</span></td>
+                    <td id="t-ss-mc-total"></td><td id="t-ss-mc-google"></td><td id="t-ss-mc-meta"></td>
+                    <td class="col-sep"><span class="dash">—</span></td><td><span class="dash">—</span></td></tr>
+                </tbody>
+            </table></div>
+        </div>
+        <div class="footnote">
+            <strong>Metodología:</strong> Promedio semanal de cada período. Elasticidad = %Δ Resultado / %Δ Spend. Costo Marginal = ΔSpend / ΔResultado (USD por unidad).<br>
+            <strong>Purchases / Sesiones:</strong> <span class="dot dot-up"></span>sube = positivo, <span class="dot dot-down"></span>baja = negativo.<br>
+            <strong>Spend:</strong> <span class="dot dot-up"></span>baja = positivo (gastás menos), <span class="dot dot-down"></span>sube = negativo (gastás más).<br>
+            <strong>Organic / Others:</strong> Sin spend asociado → elasticidad y costo marginal no aplican.
+        </div>
+    </div>
+    </div><!-- /tab-elasticidades -->
+
+    <!-- TAB 2: EVOLUCIÓN -->
+    <div id="tab-evolucion" class="tab-content">
+    <div class="container">
+        <div class="page-header">
+            <h1>Evolución semanal: Spend vs Resultados</h1>
+            <div id="evo-sub" class="page-meta">
+                <span class="meta-chip"><b>Base</b> W10–W13</span>
+                <span class="meta-chip"><b>Actual</b> W14–W15</span>
+                <span class="meta-chip-sep"></span>
+                <span class="meta-chip">Eje izq.: Spend USD</span>
+                <span class="meta-chip">Eje der.: Volumen</span>
+            </div>
+        </div>
+        <div class="chart-section">
+            <div class="chart-section-head"><h2>Total</h2><span>Spend Google + Meta · Todas las fuentes</span></div>
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <div class="chart-card-title">Purchases Total → CPA</div>
+                    <div class="chart-card-sub">Spend total: Google + Meta</div>
+                    <div class="chart-canvas-wrap"><canvas id="c-total-purch"></canvas></div>
+                    <div class="chart-stat-bar">
+                        <div class="chart-stat"><span class="chart-stat-label">Spend prom · base</span><span class="chart-stat-value" id="stat-cpa-base-total"></span></div>
+                        <div class="chart-stat"><span class="chart-stat-label">Spend prom · actual</span><span class="chart-stat-value" id="stat-cpa-curr-total"></span></div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-card-title">Sesiones Total → CPS</div>
+                    <div class="chart-card-sub">Spend total: Google + Meta</div>
+                    <div class="chart-canvas-wrap"><canvas id="c-total-ses"></canvas></div>
+                    <div class="chart-stat-bar">
+                        <div class="chart-stat"><span class="chart-stat-label">Spend prom · base</span><span class="chart-stat-value" id="stat-cps-base-total"></span></div>
+                        <div class="chart-stat"><span class="chart-stat-label">Spend prom · actual</span><span class="chart-stat-value" id="stat-cps-curr-total"></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chart-section">
+            <div class="chart-section-head"><h2>Meta</h2><span>Spend Meta · Purchases y Sesiones de Meta</span></div>
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <div class="chart-card-title">Purchases Meta → CPA</div>
+                    <div class="chart-card-sub">&nbsp;</div>
+                    <div class="chart-canvas-wrap"><canvas id="c-meta-purch"></canvas></div>
+                    <div class="chart-stat-bar">
+                        <div class="chart-stat"><span class="chart-stat-label">Spend prom · base</span><span class="chart-stat-value" id="stat-cpa-base-meta"></span></div>
+                        <div class="chart-stat"><span class="chart-stat-label">Spend prom · actual</span><span class="chart-stat-value" id="stat-cpa-curr-meta"></span></div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-card-title">Sesiones Meta → CPS</div>
+                    <div class="chart-card-sub">&nbsp;</div>
+                    <div class="chart-canvas-wrap"><canvas id="c-meta-ses"></canvas></div>
+                    <div class="chart-stat-bar">
+                        <div class="chart-stat"><span class="chart-stat-label">Spend prom · base</span><span class="chart-stat-value" id="stat-cps-base-meta"></span></div>
+                        <div class="chart-stat"><span class="chart-stat-label">Spend prom · actual</span><span class="chart-stat-value" id="stat-cps-curr-meta"></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chart-section">
+            <div class="chart-section-head"><h2>Google</h2><span>Purchases Google (Search + PMAX) y Sesiones Google</span></div>
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <div class="chart-card-title">Purchases Google → CPA</div>
+                    <div class="chart-card-sub">Search + PMAX combinados</div>
+                    <div class="chart-canvas-wrap"><canvas id="c-google-purch"></canvas></div>
+                    <div class="chart-stat-bar">
+                        <div class="chart-stat"><span class="chart-stat-label">Spend prom · base</span><span class="chart-stat-value" id="stat-cpa-base-google"></span></div>
+                        <div class="chart-stat"><span class="chart-stat-label">Spend prom · actual</span><span class="chart-stat-value" id="stat-cpa-curr-google"></span></div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-card-title">Sesiones Google → CPS</div>
+                    <div class="chart-card-sub">Search + PMAX combinados</div>
+                    <div class="chart-canvas-wrap"><canvas id="c-google-ses"></canvas></div>
+                    <div class="chart-stat-bar">
+                        <div class="chart-stat"><span class="chart-stat-label">Spend prom · base</span><span class="chart-stat-value" id="stat-cps-base-google"></span></div>
+                        <div class="chart-stat"><span class="chart-stat-label">Spend prom · actual</span><span class="chart-stat-value" id="stat-cps-curr-google"></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div><!-- /tab-evolucion -->
+
+    <!-- TAB 3: CVR -->
+    <div id="tab-cvr" class="tab-content">
+    <div class="container">
+        <div class="page-header">
+            <h1>Evolución semanal: CVR</h1>
+            <div id="cvr-sub" class="page-meta">
+                <span class="meta-chip"><b>Base</b> W10–W13</span>
+                <span class="meta-chip"><b>Actual</b> W14–W15</span>
+                <span class="meta-chip-sep"></span>
+                <span class="meta-chip">Eje izq.: Purchases</span>
+                <span class="meta-chip">Eje der.: CVR %</span>
+            </div>
+        </div>
+        <div class="chart-section">
+            <div class="chart-section-head"><h2>Total</h2><span>Purchases totales vs Sesiones totales</span></div>
+            <div class="chart-grid" style="grid-template-columns:1fr">
+                <div class="chart-card">
+                    <div class="chart-card-title">Purchases → CVR · Total</div>
+                    <div class="chart-card-sub">Línea: CVR total (%)</div>
+                    <div class="chart-canvas-wrap"><canvas id="cv-total"></canvas></div>
+                    <div class="chart-stat-bar">
+                        <div class="chart-stat"><span class="chart-stat-label">Purchases prom · base</span><span class="chart-stat-value" id="stat-cvr-base-total"></span></div>
+                        <div class="chart-stat"><span class="chart-stat-label">Purchases prom · actual</span><span class="chart-stat-value" id="stat-cvr-curr-total"></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chart-section">
+            <div class="chart-section-head"><h2>Meta</h2><span>Purchases Meta vs Sesiones Meta</span></div>
+            <div class="chart-grid" style="grid-template-columns:1fr">
+                <div class="chart-card">
+                    <div class="chart-card-title">Purchases → CVR · Meta</div>
+                    <div class="chart-card-sub">Línea: CVR Meta (%)</div>
+                    <div class="chart-canvas-wrap"><canvas id="cv-meta"></canvas></div>
+                    <div class="chart-stat-bar">
+                        <div class="chart-stat"><span class="chart-stat-label">Purchases prom · base</span><span class="chart-stat-value" id="stat-cvr-base-meta"></span></div>
+                        <div class="chart-stat"><span class="chart-stat-label">Purchases prom · actual</span><span class="chart-stat-value" id="stat-cvr-curr-meta"></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chart-section">
+            <div class="chart-section-head"><h2>Google</h2><span>Purchases Google (Search + PMAX) vs Sesiones Google</span></div>
+            <div class="chart-grid" style="grid-template-columns:1fr">
+                <div class="chart-card">
+                    <div class="chart-card-title">Purchases → CVR · Google</div>
+                    <div class="chart-card-sub">Línea: CVR Google (%)</div>
+                    <div class="chart-canvas-wrap"><canvas id="cv-google"></canvas></div>
+                    <div class="chart-stat-bar">
+                        <div class="chart-stat"><span class="chart-stat-label">Purchases prom · base</span><span class="chart-stat-value" id="stat-cvr-base-google"></span></div>
+                        <div class="chart-stat"><span class="chart-stat-label">Purchases prom · actual</span><span class="chart-stat-value" id="stat-cvr-curr-google"></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div><!-- /tab-cvr -->
+</div><!-- /view-country -->
+
+<script>
+// ══════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════
+const COUNTRIES_META = {
+    TOTAL: { name:'Total LatAm', flag:'LA', sub:'AR + CL + UY', cardClass:'country-card-total', accent:'#27272a' },
+    AR:    { name:'Argentina',   flag:'AR', sub:'Buenos Aires · 2026', cardClass:'', accent:'#1d4ed8' },
+    CL:    { name:'Chile',       flag:'CL', sub:'Santiago · 2026', cardClass:'', accent:'#dc2626' },
+    UY:    { name:'Uruguay',     flag:'UY', sub:'Montevideo · 2026', cardClass:'', accent:'#0d9488' },
+};
+
+const DATA = /*__BUILD_DATA__*/{};
+
+// Base indices: W10-W13 = index 9-12, actual = 13-14
+const BASE_I = [9, 12], ACT_I = [13, 14];
+
+// ══════════════════════════════════════════════
+//  ACTIVE COUNTRY STATE & CHART INSTANCES
+// ══════════════════════════════════════════════
+let activeCountry = null;
+let chartInstances = {};
+let evoInited = false, cvrInited = false;
+
+// ══════════════════════════════════════════════
+//  HOME
+// ══════════════════════════════════════════════
+function fmtN(v) {
+    if (v == null) return '—';
+    return Math.round(v).toLocaleString('es-AR');
+}
+function fmtMoney(v) {
+    if (v == null) return '—';
+    if (v >= 1000) return '$' + (v/1000).toFixed(1) + 'K';
+    return '$' + v.toFixed(0);
+}
+function fmtPct(v, inverse) {
+    if (v == null) return '';
+    // For spend: lower = good (inverse=true), for results: higher = good
+    const good = inverse ? v <= 0 : v >= 0;
+    const cls = good ? 'kpi-up' : 'kpi-down';
+    const sign = v >= 0 ? '+' : '';
+    return `<span class="ckpi-pct ${cls}">${sign}${v.toFixed(1)}%</span>`;
+}
+
+function buildHomeCards() {
+    // ── Featured TOTAL card ──
+    const totalSlot = document.getElementById('total-card-slot');
+    const tmeta = COUNTRIES_META['TOTAL'];
+    const T = DATA['TOTAL'].elas.total;
+    const totalCard = document.createElement('div');
+    totalCard.className = 'total-card';
+    totalCard.innerHTML = `
+        <div class="total-card-left">
+            <span class="total-flag-badge">${tmeta.flag}</span>
+            <div class="total-name">${tmeta.name}</div>
+            <div class="total-sub">${tmeta.sub}</div>
+        </div>
+        <div class="total-stats">
+            <div>
+                <div class="total-stat-label">Spend / sem</div>
+                <div class="total-stat-val">${fmtMoney(T.spend_actual)}</div>
+                ${tDelta(T.spend_pct, true)}
+            </div>
+            <div>
+                <div class="total-stat-label">Purchases / sem</div>
+                <div class="total-stat-val">${fmtN(T.purch_actual)}</div>
+                ${tDelta(T.purch_pct, false)}
+            </div>
+            <div>
+                <div class="total-stat-label">Sesiones / sem</div>
+                <div class="total-stat-val">${fmtBigN(T.ses_actual)}</div>
+                ${tDelta(T.ses_pct, false)}
+            </div>
+        </div>
+        <div class="total-cta">→</div>
+    `;
+    totalCard.addEventListener('click', () => openCountry('TOTAL'));
+    totalSlot.appendChild(totalCard);
+
+    // ── Country cards (3 columns) ──
+    const grid = document.getElementById('country-grid');
+    ['AR','CL','UY'].forEach(code => {
+        const meta = COUNTRIES_META[code];
+        const elas = DATA[code].elas;
+        const d = elas.total;
+        const eClass = d.e_purch != null ? (d.e_purch >= 0 ? 'elast-pos' : 'elast-neg') : '';
+        const eDisp  = d.e_purch != null
+            ? (Math.abs(d.e_purch) > 10 ? (d.e_purch>0?'>10':'<−10') : d.e_purch.toFixed(2))
+            : '—';
+
+        const card = document.createElement('div');
+        card.className = 'country-card';
+        card.innerHTML = `
+            <div class="country-card-top">
+                <div class="country-ident">
+                    <div class="country-flag-box" style="background:${meta.accent}15; color:${meta.accent}; border:1.5px solid ${meta.accent}30;">${meta.flag}</div>
+                    <div class="country-name-box">
+                        <h3>${meta.name}</h3>
+                        <span>${meta.sub}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="country-card-body">
+                <div class="ckpi">
+                    <span class="ckpi-label">Spend / sem</span>
+                    <span class="ckpi-right">
+                        <span class="ckpi-val">${fmtMoney(d.spend_actual)}</span>
+                        ${fmtPct(d.spend_pct, true)}
+                    </span>
+                </div>
+                <div class="ckpi">
+                    <span class="ckpi-label">Purchases / sem</span>
+                    <span class="ckpi-right">
+                        <span class="ckpi-val">${fmtN(d.purch_actual)}</span>
+                        ${fmtPct(d.purch_pct, false)}
+                    </span>
+                </div>
+                <div class="ckpi">
+                    <span class="ckpi-label">Sesiones / sem</span>
+                    <span class="ckpi-right">
+                        <span class="ckpi-val">${fmtBigN(d.ses_actual)}</span>
+                        ${fmtPct(d.ses_pct, false)}
+                    </span>
+                </div>
+            </div>
+            <div class="country-card-foot">
+                <span>Ver análisis detallado</span>
+                <span class="arrow">→</span>
+            </div>
+        `;
+        card.addEventListener('click', () => openCountry(code));
+        grid.appendChild(card);
+    });
+
+    // Home date stamp
+    const d = new Date();
+    const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+    document.getElementById('home-date').textContent = `${d.getDate()} ${meses[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+// Delta pill for Total hero card (dark theme)
+function tDelta(v, inverse) {
+    if (v == null) return '';
+    const good = inverse ? v <= 0 : v >= 0;
+    const cls = good ? 'tstat-up' : 'tstat-down';
+    const arr = v >= 0 ? '↑' : '↓';
+    const sign = v >= 0 ? '+' : '';
+    return `<span class="total-stat-delta ${cls}">${arr} ${sign}${v.toFixed(1)}%</span>`;
+}
+
+// Format big numbers (K / M)
+function fmtBigN(v) {
+    if (v == null) return '—';
+    if (v >= 1000000) return (v/1000000).toFixed(1).replace('.',',') + 'M';
+    if (v >= 1000)    return (v/1000).toFixed(1).replace('.',',') + 'K';
+    return Math.round(v).toLocaleString('es-AR');
+}
+
+// ══════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════
+function goHome() {
+    document.getElementById('view-home').style.display = 'block';
+    document.getElementById('view-country').style.display = 'none';
+    document.getElementById('nav-sub').textContent = 'LatAm · 2026';
+    document.getElementById('nav-logo').querySelector('span').textContent = 'Elasticidades';
+    // Destroy charts to free memory
+    Object.values(chartInstances).forEach(ch => { try { ch.destroy(); } catch(e){} });
+    chartInstances = {};
+    evoInited = false;
+    cvrInited = false;
+    // Reset tabs
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelector('.tab-btn[data-tab="elasticidades"]').classList.add('active');
+    document.getElementById('tab-elasticidades').classList.add('active');
+}
+
+function openCountry(code) {
+    activeCountry = code;
+    const meta = COUNTRIES_META[code];
+    document.getElementById('view-home').style.display = 'none';
+    document.getElementById('view-country').style.display = 'block';
+    document.getElementById('nav-sub').textContent = meta.name + ' · Elasticidades';
+    const crumb = document.getElementById('crumb-country');
+    if (crumb) crumb.textContent = `${meta.flag} ${meta.name}`;
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'instant' });
+
+    // Reset tabs
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelector('.tab-btn[data-tab="elasticidades"]').classList.add('active');
+    document.getElementById('tab-elasticidades').classList.add('active');
+    evoInited = false; cvrInited = false;
+
+    // Render elasticidades
+    renderElas(code);
+}
+
+// Tab switching
+document.querySelectorAll('.tab-btn[data-tab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (!btn.dataset.tab) return;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+        if (btn.dataset.tab === 'evolucion' && !evoInited) {
+            evoInited = true;
+            initEvolucion(activeCountry);
+        }
+        if (btn.dataset.tab === 'cvr' && !cvrInited) {
+            cvrInited = true;
+            initCVR(activeCountry);
+        }
+    });
+});
+
+// ══════════════════════════════════════════════
+//  ELASTICIDADES RENDER
+// ══════════════════════════════════════════════
+function fmtNum(n) {
+    if (n == null) return '—';
+    return Math.abs(Math.round(n)).toLocaleString('es-AR');
+}
+function resultPctPill(v) {
+    if (v == null) return '<span class="dash">—</span>';
+    const cls=v>=0?'pill-up':'pill-down', arr=v>=0?'↑':'↓', sign=v>=0?'+':'−';
+    return `<span class="pill ${cls}"><span class="pill-arrow">${arr}</span> ${sign}${Math.abs(v).toFixed(1)}%</span>`;
+}
+function spendPctPill(v) {
+    if (v == null) return '<span class="dash">—</span>';
+    const cls=v<=0?'pill-up':'pill-down', arr=v>=0?'↑':'↓', sign=v>=0?'+':'−';
+    return `<span class="pill ${cls}"><span class="pill-arrow">${arr}</span> ${sign}${Math.abs(v).toFixed(1)}%</span>`;
+}
+function nomVal(v, prefix) {
+    if (v == null) return '<span class="dash">—</span>';
+    prefix=prefix||'';
+    return `<span class="nom-val">${v>=0?'+':'−'}${prefix}${fmtNum(Math.abs(v))}</span>`;
+}
+function ePill(e, pr, ps) {
+    if (e == null) return '<span class="dash">—</span>';
+    let cls = 'e-neutral';
+    if (e < 0 && pr != null && ps != null) {
+        if (pr >= 0 && ps < 0) cls = 'e-good';
+        else if (pr < 0 && ps >= 0) cls = 'e-bad';
+    } else if (e > 1 && pr != null && ps != null) {
+        if (pr < 0 && ps < 0) cls = 'e-bad';
+        else if (pr > 0 && ps > 0) cls = 'e-good';
+    }
+    const disp = Math.abs(e)>10?(e>0?'>10':'<−10'):e.toFixed(2);
+    return `<span class="epill ${cls}">${disp}</span>`;
+}
+function mcVal(mc, dr) {
+    if (mc == null || dr == null || dr <= 0) return '<span class="dash">—</span>';
+    const abs = Math.abs(mc);
+    let fmt = abs>=10?abs.toFixed(0):abs>=1?abs.toFixed(2):abs.toFixed(3);
+    fmt = fmt.replace('.',',');
+    return `<span class="mc-val">${mc<0?'−':''}$${fmt}</span>`;
+}
+function mcValSes(mc, dr) {
+    if (mc == null || dr == null || dr <= 0) return '<span class="dash">—</span>';
+    const abs = Math.abs(mc);
+    let fmt = abs>=1?abs.toFixed(3):abs.toFixed(5);
+    fmt = fmt.replace('.',',');
+    return `<span class="mc-val">${mc<0?'−':''}$${fmt}</span>`;
+}
+function set(id, html) { const el=document.getElementById(id); if(el) el.innerHTML=html; }
+function numFmt(v) {
+    if (v == null) return '<span class="dash">—</span>';
+    return Math.round(v).toLocaleString('es-AR');
+}
+
+function renderElas(code) {
+    const E = DATA[code].elas;
+    const bw = E.base_weeks, aw = E.actual_weeks;
+    set('elas-title', COUNTRIES_META[code].name + ': Elasticidades Spend vs Resultados');
+    set('elas-sub', `<div class="page-meta">
+        <span class="meta-chip"><b>Base</b> ${bw}</span>
+        <span class="meta-chip"><b>Actual</b> ${aw}</span>
+        <span class="meta-chip-sep"></span>
+        <span class="meta-chip">Elasticidad = %Δ Resultado / %Δ Spend</span>
+        <span class="meta-chip">Costo Marginal = ΔSpend / ΔResultado</span>
+    </div>`);
+    
+    const chs = ['total','google','meta'];
+    
+    // Purchases table
+    chs.forEach(ch => {
+        const d = E[ch];
+        set(`t-ps-sb-${ch}`, '$' + fmtNum(d.spend_base));
+        set(`t-ps-sa-${ch}`, '$' + fmtNum(d.spend_actual));
+        set(`t-ps-sn-${ch}`, nomVal(d.spend_nom, '$'));
+        set(`t-ps-sp-${ch}`, spendPctPill(d.spend_pct));
+        set(`t-ps-pb-${ch}`, fmtNum(d.purch_base));
+        set(`t-ps-pa-${ch}`, fmtNum(d.purch_actual));
+        set(`t-ps-pn-${ch}`, nomVal(d.purch_nom));
+        set(`t-ps-pp-${ch}`, resultPctPill(d.purch_pct));
+        set(`t-ps-e-${ch}`,  ePill(d.e_purch, d.purch_pct, d.spend_pct));
+        set(`t-ps-mc-${ch}`, mcVal(d.mc_purch, d.purch_nom));
+        // Sessions table
+        set(`t-ss-sb-${ch}`, '$' + fmtNum(d.spend_base));
+        set(`t-ss-sa-${ch}`, '$' + fmtNum(d.spend_actual));
+        set(`t-ss-sn-${ch}`, nomVal(d.spend_nom, '$'));
+        set(`t-ss-sp-${ch}`, spendPctPill(d.spend_pct));
+        set(`t-ss-sesb-${ch}`, numFmt(d.ses_base));
+        set(`t-ss-sesa-${ch}`, numFmt(d.ses_actual));
+        set(`t-ss-sn2-${ch}`,  nomVal(d.ses_nom));
+        set(`t-ss-sp2-${ch}`,  resultPctPill(d.ses_pct));
+        set(`t-ss-e-${ch}`,   ePill(d.e_ses, d.ses_pct, d.spend_pct));
+        set(`t-ss-mc-${ch}`,  mcValSes(d.mc_ses, d.ses_nom));
+    });
+    ['organic','others'].forEach(ch => {
+        const d = E[ch];
+        set(`t-ps-pb-${ch}`, fmtNum(d.purch_base));
+        set(`t-ps-pa-${ch}`, fmtNum(d.purch_actual));
+        set(`t-ps-pn-${ch}`, nomVal(d.purch_nom));
+        set(`t-ps-pp-${ch}`, resultPctPill(d.purch_pct));
+        // Sessions for organic/others — only show dash
+        set(`t-ss-sesb-${ch}`, '<span class="dash">—</span>');
+        set(`t-ss-sesa-${ch}`, '<span class="dash">—</span>');
+        set(`t-ss-sn2-${ch}`,  '<span class="dash">—</span>');
+        set(`t-ss-sp2-${ch}`,  '<span class="dash">—</span>');
+    });
+}
+
+// ══════════════════════════════════════════════
+//  CHART HELPERS
+// ══════════════════════════════════════════════
+Chart.defaults.font.family = "'DM Sans', -apple-system, sans-serif";
+Chart.defaults.font.size   = 11;
+Chart.defaults.color       = '#6b7280';
+
+function getBaseActualIdxs(nWeeks) {
+    // Always W10-W13 = indices 9-12, W14-W15 = 13-14
+    return { base:[9,12], actual:[13, Math.min(14, nWeeks-1)] };
+}
+
+function makePeriodShadePlugin(bi0, bi1, ai0, ai1) {
+    return {
+        id: 'periodShade_' + Math.random(),
+        beforeDraw(chart) {
+            const { ctx, chartArea, scales } = chart;
+            if (!chartArea || !scales.x) return;
+            const x = scales.x;
+            const bw = x.getPixelForValue(1) - x.getPixelForValue(0);
+            const shade = (i0, i1, color) => {
+                const px0 = x.getPixelForValue(i0) - bw/2;
+                const px1 = x.getPixelForValue(i1) + bw/2;
+                ctx.save(); ctx.fillStyle = color;
+                ctx.fillRect(px0, chartArea.top, px1-px0, chartArea.height);
+                ctx.restore();
+            };
+            shade(bi0, bi1, 'rgba(0,0,0,0.09)');
+            shade(ai0, ai1, 'rgba(13,148,136,0.16)');
+        }
+    };
+}
+
+function makeChart(canvasId, labels, datasets, resultLabel, leftLabel, rightFmt, bi0, bi1, ai0, ai1) {
+    // Destroy existing
+    if (chartInstances[canvasId]) { chartInstances[canvasId].destroy(); delete chartInstances[canvasId]; }
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return null;
+    const ctx = canvas.getContext('2d');
+    const leftIsMoney = !leftLabel || leftLabel === 'USD';
+    const leftTickCb = v => v>=1000?'$'+(v/1000)+'K':'$'+v;
+    const rightTickCb = rightFmt==='money'
+        ? v => '$'+(v<1?v.toFixed(2):v<10?v.toFixed(1):v.toFixed(0)).replace('.',',')
+        : rightFmt==='pct'
+        ? v => v.toFixed(2).replace('.',',')+'%'
+        : v => v>=1000?(v/1000).toFixed(0)+'K':String(Math.round(v));
+    
+    const plugin = makePeriodShadePlugin(bi0, bi1, ai0, ai1);
+    const chart = new Chart(ctx, {
+        plugins: [plugin],
+        data: { labels, datasets },
+        options: {
+            responsive:true, maintainAspectRatio:false,
+            interaction:{ mode:'index', intersect:false },
+            plugins:{
+                legend:{ position:'bottom', labels:{ boxWidth:11, padding:14, font:{size:11} } },
+                tooltip:{ callbacks:{ label(ctx){
+                    const v=ctx.raw;
+                    if(v==null) return null;
+                    if(ctx.dataset.yAxisID==='ySpend') return ` ${ctx.dataset.label}: $${Math.round(v).toLocaleString('es-AR')}`;
+                    if(rightFmt==='money') return ` ${ctx.dataset.label}: $${(v||0).toFixed(2).replace('.',',')}`;
+                    if(rightFmt==='pct')   return ` ${ctx.dataset.label}: ${(v||0).toFixed(2).replace('.',',')}%`;
+                    return ` ${ctx.dataset.label}: ${Math.round(v).toLocaleString('es-AR')}`;
+                }}}
+            },
+            scales:{
+                x:{ grid:{display:false}, ticks:{font:{size:10}} },
+                ySpend:{ type:'linear', position:'left', stacked:true, grid:{color:'#f3f4f6'},
+                    ticks:{font:{size:10}, callback:leftTickCb},
+                    title:{display:true, text:leftLabel||'USD', font:{size:10}, color:'#9ca3af'} },
+                yResult:{ type:'linear', position:'right', grid:{display:false},
+                    ticks:{font:{size:10}, callback:rightTickCb},
+                    title:{display:true, text:resultLabel, font:{size:10}, color:'#9ca3af'} }
+            }
+        }
+    });
+    chartInstances[canvasId] = chart;
+    return chart;
+}
+
+function fmtMoneyFull(v) {
+    if (v==null) return '—';
+    if(v>=1000) return '$'+(v/1000).toFixed(1).replace('.',',')+' K';
+    return '$'+v.toFixed(2).replace('.',',');
+}
+function fmtBig(v) {
+    if(v==null) return '—';
+    if(v>=1000000) return (v/1000000).toFixed(1).replace('.',',')+'M';
+    if(v>=1000)    return (v/1000).toFixed(1).replace('.',',')+'K';
+    return String(Math.round(v));
+}
+function avgArr(arr, i0, i1) {
+    const vals = arr.slice(i0, i1+1).filter(v=>v!=null);
+    return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+}
+
+function lineDs(label, data) {
+    return { type:'line', label, data, yAxisID:'yResult',
+             borderColor:'#18181b', backgroundColor:'transparent',
+             borderWidth:2.5, pointRadius:3, pointBackgroundColor:'#18181b',
+             tension:0.25, order:0 };
+}
+function barDs(label, data, color) {
+    return { type:'bar', label, data, yAxisID:'ySpend',
+             backgroundColor:color, borderRadius:3, stack:'s', order:1 };
+}
+
+function initEvolucion(code) {
+    const E = DATA[code].evo;
+    const n = E.weeks.length;
+    const bi0=9, bi1=Math.min(12,n-1), ai0=13, ai1=Math.min(14,n-1);
+    const labels = E.weeks;
+    
+    const purch_google = E.purch_search.map((v,i) => (v||0)+(E.purch_pmax[i]||0));
+    const ses_google   = E.ses_search.map((v,i)   => (v||0)+(E.ses_pmax[i]||0));
+    
+    const safe = (a,b) => b>0 ? +(a/b).toFixed(3) : null;
+    const cpa_total  = E.spend_total.map((s,i)  => E.purch_total[i]>0  ? safe(s,E.purch_total[i])  : null);
+    const cpa_google = E.spend_google.map((s,i) => purch_google[i]>0   ? safe(s,purch_google[i])   : null);
+    const cpa_meta   = E.spend_meta.map((s,i)   => (E.purch_meta[i]||0)>0 ? safe(s,E.purch_meta[i]) : null);
+    const cps_total  = E.spend_total.map((s,i)  => (E.ses_total[i]||0)>0   ? +(s/E.ses_total[i]).toFixed(5)   : null);
+    const cps_google = E.spend_google.map((s,i) => ses_google[i]>0         ? +(s/ses_google[i]).toFixed(5)     : null);
+    const cps_meta   = E.spend_meta.map((s,i)   => (E.ses_meta[i]||0)>0   ? +(s/E.ses_meta[i]).toFixed(5)    : null);
+    
+    const C = { total:'rgba(196,181,253,0.85)', google:'rgba(252,211,77,0.85)', meta:'rgba(147,197,253,0.85)' };
+    
+    makeChart('c-total-purch',  labels, [barDs('Purchases',E.purch_total,C.total),  lineDs('CPA',cpa_total)],  'CPA (USD)','Purchases','money',bi0,bi1,ai0,ai1);
+    makeChart('c-total-ses',    labels, [barDs('Sesiones', E.ses_total,  C.total),  lineDs('CPS',cps_total)],  'CPS (USD)','Sesiones', 'money',bi0,bi1,ai0,ai1);
+    makeChart('c-meta-purch',   labels, [barDs('Purchases',E.purch_meta, C.meta),   lineDs('CPA',cpa_meta)],   'CPA (USD)','Purchases','money',bi0,bi1,ai0,ai1);
+    makeChart('c-meta-ses',     labels, [barDs('Sesiones', E.ses_meta,   C.meta),   lineDs('CPS',cps_meta)],   'CPS (USD)','Sesiones', 'money',bi0,bi1,ai0,ai1);
+    makeChart('c-google-purch', labels, [barDs('Purchases',purch_google, C.google), lineDs('CPA',cpa_google)], 'CPA (USD)','Purchases','money',bi0,bi1,ai0,ai1);
+    makeChart('c-google-ses',   labels, [barDs('Sesiones', ses_google,   C.google), lineDs('CPS',cps_google)], 'CPS (USD)','Sesiones', 'money',bi0,bi1,ai0,ai1);
+    
+    function setS(id, html) { const el=document.getElementById(id); if(el) el.innerHTML=html; }
+    function avgS(a,i0,i1,w) { return fmtMoneyFull(avgArr(a,i0,i1)) + '<span class="chart-stat-unit">prom/sem</span>'; }
+    
+    setS('stat-cpa-base-total',  avgS(E.spend_total,bi0,bi1,4));
+    setS('stat-cpa-curr-total',  avgS(E.spend_total,ai0,ai1,2));
+    setS('stat-cps-base-total',  avgS(E.spend_total,bi0,bi1,4));
+    setS('stat-cps-curr-total',  avgS(E.spend_total,ai0,ai1,2));
+    setS('stat-cpa-base-google', avgS(E.spend_google,bi0,bi1,4));
+    setS('stat-cpa-curr-google', avgS(E.spend_google,ai0,ai1,2));
+    setS('stat-cps-base-google', avgS(E.spend_google,bi0,bi1,4));
+    setS('stat-cps-curr-google', avgS(E.spend_google,ai0,ai1,2));
+    setS('stat-cpa-base-meta',   avgS(E.spend_meta,bi0,bi1,4));
+    setS('stat-cpa-curr-meta',   avgS(E.spend_meta,ai0,ai1,2));
+    setS('stat-cps-base-meta',   avgS(E.spend_meta,bi0,bi1,4));
+    setS('stat-cps-curr-meta',   avgS(E.spend_meta,ai0,ai1,2));
+}
+
+function initCVR(code) {
+    const E = DATA[code].evo;
+    const n = E.weeks.length;
+    const bi0=9, bi1=Math.min(12,n-1), ai0=13, ai1=Math.min(14,n-1);
+    const labels = E.weeks;
+    
+    const purch_google = E.purch_search.map((v,i) => (v||0)+(E.purch_pmax[i]||0));
+    const ses_google   = E.ses_search.map((v,i)   => (v||0)+(E.ses_pmax[i]||0));
+    
+    const cvr_total  = E.purch_total.map((p,i)  => (E.ses_total[i]||0)>0  ? +(p/E.ses_total[i]*100).toFixed(4)  : null);
+    const cvr_google = purch_google.map((p,i)    => ses_google[i]>0        ? +(p/ses_google[i]*100).toFixed(4)   : null);
+    const cvr_meta   = E.purch_meta.map((p,i)    => (E.ses_meta[i]||0)>0  ? +(p/E.ses_meta[i]*100).toFixed(4)   : null);
+    
+    const C = { total:'rgba(196,181,253,0.85)', google:'rgba(252,211,77,0.85)', meta:'rgba(147,197,253,0.85)' };
+    
+    makeChart('cv-total',  labels, [barDs('Purchases',E.purch_total,C.total),  lineDs('CVR (%)',cvr_total)],  'CVR (%)','Purchases','pct',bi0,bi1,ai0,ai1);
+    makeChart('cv-meta',   labels, [barDs('Purchases',E.purch_meta, C.meta),   lineDs('CVR (%)',cvr_meta)],   'CVR (%)','Purchases','pct',bi0,bi1,ai0,ai1);
+    makeChart('cv-google', labels, [barDs('Purchases',purch_google, C.google), lineDs('CVR (%)',cvr_google)], 'CVR (%)','Purchases','pct',bi0,bi1,ai0,ai1);
+    
+    function setS(id, html) { const el=document.getElementById(id); if(el) el.innerHTML=html; }
+    function avgB(a,i0,i1) { return fmtBig(avgArr(a,i0,i1)) + '<span class="chart-stat-unit">prom/sem</span>'; }
+    
+    setS('stat-cvr-base-total',  avgB(E.purch_total,bi0,bi1));
+    setS('stat-cvr-curr-total',  avgB(E.purch_total,ai0,ai1));
+    setS('stat-cvr-base-google', avgB(purch_google,bi0,bi1));
+    setS('stat-cvr-curr-google', avgB(purch_google,ai0,ai1));
+    setS('stat-cvr-base-meta',   avgB(E.purch_meta,bi0,bi1));
+    setS('stat-cvr-curr-meta',   avgB(E.purch_meta,ai0,ai1));
+}
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+buildHomeCards();
+</script>
+</body>
+</html>
