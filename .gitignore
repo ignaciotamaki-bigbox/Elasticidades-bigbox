@@ -25,3 +25,7 @@ Thumbs.db
 # Archivos temporales del build
 /tmp/
 *.xlsx.tmp
+
+# data.json no va al repo: Pages lo serviría en texto plano y bypasearía el password
+data.json
+_enc/
