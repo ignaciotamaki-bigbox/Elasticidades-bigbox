@@ -63,11 +63,11 @@ jobs:
             exit 1
           fi
           # Encripta index.html con staticrypt → genera blob AES-256.
-          # --remember 7 = recordar login por 7 días en el browser.
+          # --remember 30 = recordar login por 30 días en el browser.
           npx --yes staticrypt@latest index.html \
             -p "$SITE_PASSWORD" \
             -d _enc \
-            --remember 7 \
+            --remember 30 \
             --template-title "Bigbox — Elasticidades" \
             --template-instructions "Ingresá la contraseña para acceder al dashboard." \
             --template-button "Entrar" \
