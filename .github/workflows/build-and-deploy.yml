@@ -53,17 +53,40 @@ jobs:
           FILE_ID_UY: ${{ secrets.FILE_ID_UY }}
         run: python build.py --json-out data.json --html-out index.html --template template.html
 
-      - name: Commit index.html and data.json if changed
+      - name: Encrypt index.html with password
+        env:
+          SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
+        run: |
+          if [ -z "$SITE_PASSWORD" ]; then
+            echo "ERROR: el secret SITE_PASSWORD está vacío."
+            echo "Agregalo en Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          # Encripta index.html con staticrypt → genera blob AES-256.
+          # --remember 7 = recordar login por 7 días en el browser.
+          npx --yes staticrypt@latest index.html \
+            -p "$SITE_PASSWORD" \
+            -d _enc \
+            --remember 7 \
+            --template-title "Bigbox — Elasticidades" \
+            --template-instructions "Ingresá la contraseña para acceder al dashboard." \
+            --template-button "Entrar" \
+            --template-color-primary "#18181b"
+          mv _enc/index.html index.html
+          rm -rf _enc
+          echo "index.html encriptado OK ($(wc -c < index.html) bytes)"
+
+      - name: Commit index.html if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Stagear solo lo que queremos commitear (NO credentials.json)
-          git add index.html data.json
+          # IMPORTANTE: NO committeamos data.json porque Pages lo serviría en
+          # texto plano y bypasearía el password. El index.html va encriptado.
+          git add index.html
 
-          # Si no hay cambios, git diff --cached devuelve exit 0 sin diff
           if git diff --cached --quiet; then
-            echo "No hay cambios en index.html ni data.json. Nada que commitear."
+            echo "No hay cambios en index.html. Nada que commitear."
           else
             echo "Hay cambios. Commiteando..."
             git commit -m "[skip ci] Auto-build: actualizar dashboard ($(date -u +'%Y-%m-%d %H:%M UTC'))"
