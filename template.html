@@ -6,16 +6,34 @@
     <title>Elasticidades — Bigbox</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
         :root {
-            --bg: #f7f7f8; --card: #fff; --border: #ebebeb;
-            --text: #18181b; --muted: #6b7280; --black: #18181b;
-            --up: #0d9488;     --up-bg: #f0fdfa;     --up-border: #ccfbf1;
-            --down: #e11d48;   --down-bg: #fff1f2;   --down-border: #ffe4e6;
-            --neutral-bg: #f4f4f5; --neutral-text: #52525b;
+            /* === Bigbox · Identidad ===
+               Manual de marca: base institucional blanco/negro,
+               el color entra a destacar lo que realmente importa. */
+            --bb-graphite: #2d2c2b;   /* gris Bigbox */
+            --bb-cherry:   #db1b4d;   /* Ñam · gastronomía */
+            --bb-yellow:   #ffc715;   /* Ahh · aventura */
+            --bb-green:    #45e4be;   /* Wow · escapadas */
+            --bb-violet:   #b6b6ef;   /* Omm · estar bien */
+
+            /* Neutrales */
+            --bg: #ffffff;
+            --card: #ffffff;
+            --border: #ececec;
+            --border-strong: #1a1a1a;
+            --text: #1a1a1a;
+            --muted: #6b6b6b;
+            --black: #1a1a1a;
+
+            /* Estados (positivo = verde Bigbox; negativo = cherry Bigbox) */
+            --up: #1e9c7d;   --up-bg: #ecfaf4;   --up-border: #c6f0e0;
+            --down: #db1b4d; --down-bg: #fdebf0; --down-border: #f8c5d3;
+
+            --neutral-bg: #f6f6f6; --neutral-text: #4a4a4a;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'DM Sans',-apple-system,sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; }
+        body { font-family:'Manrope',-apple-system,sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; letter-spacing:-0.005em; }
 
         /* NAVBAR */
         .navbar {
@@ -24,13 +42,12 @@
             padding-top:18px;
             position:sticky; top:0; z-index:100;
         }
-        .logo { font-size:22px; font-weight:700; color:#fff; letter-spacing:-0.5px; }
+        .logo { font-size:22px; font-weight:800; color:#fff; letter-spacing:-0.7px; }
         .logo span {
-            font-weight:500; margin-left:6px; font-size:17px;
-            background: linear-gradient(110deg, #71717a 0%, #d4d4d8 28%, #a1a1aa 48%, #e4e4e7 65%, #71717a 100%);
-            -webkit-background-clip: text; background-clip: text; color: transparent;
+            font-weight:400; margin-left:8px; font-size:15px;
+            color:rgba(255,255,255,0.55); letter-spacing:-0.2px;
         }
-        .nav-sub { font-size:12px; color:rgba(255,255,255,0.35); font-weight:500; letter-spacing:.3px; }
+        .nav-sub { font-size:12px; color:rgba(255,255,255,0.4); font-weight:500; letter-spacing:.2px; }
 
         .back-btn {
             background:none; border:none; color:rgba(255,255,255,0.65);
@@ -65,7 +82,7 @@
 
         .container { max-width:1280px; margin:0 auto; padding:32px 24px; }
         .page-header { margin-bottom:36px; }
-        .page-header h1 { font-family:'Outfit',sans-serif; font-size:24px; font-weight:700; letter-spacing:-0.5px; }
+        .page-header h1 { font-family:'Manrope',sans-serif; font-size:30px; font-weight:800; letter-spacing:-1px; }
         .page-header p { color:var(--muted); font-size:13px; margin-top:6px; line-height:1.7; }
 
         /* Page metadata chips */
@@ -130,13 +147,13 @@
         .e-neutral { background:var(--neutral-bg); color:var(--neutral-text); border:1px solid #e4e4e7; }
         .e-good    { background:var(--up-bg);      color:var(--up);           border:1px solid var(--up-border); }
         .e-bad     { background:var(--down-bg);    color:var(--down);         border:1px solid var(--down-border); }
-        .ch { display:inline-block; padding:3px 9px; border-radius:5px; font-size:10px; font-weight:600; letter-spacing:.3px; }
-        .ch-total   { background:#f4f4f5; color:#52525b; }
-        .ch-search  { background:#fef3c7; color:#92400e; }
-        .ch-pmax    { background:#e0f2fe; color:#075985; }
-        .ch-meta    { background:#ede9fe; color:#5b21b6; }
-        .ch-organic { background:#f0fdf4; color:#15803d; }
-        .ch-others  { background:#f4f4f5; color:#71717a; }
+        .ch { display:inline-block; padding:4px 10px; border-radius:3px; font-size:10px; font-weight:700; letter-spacing:.5px; }
+        .ch-total   { background:var(--neutral-bg); color:var(--bb-graphite); border:1px solid var(--border); }
+        .ch-search  { background:#fff6d6; color:#7a5a00; border:1px solid #ffe88a; }
+        .ch-pmax    { background:#fff6d6; color:#7a5a00; border:1px solid #ffe88a; }
+        .ch-meta    { background:#fde7ee; color:#8a1432; border:1px solid #f5c5d4; }
+        .ch-organic { background:#e6f9f1; color:#0d6b54; border:1px solid #b9ecd9; }
+        .ch-others  { background:var(--neutral-bg); color:var(--muted); border:1px solid var(--border); }
         .footnote {
             font-size:12px; color:var(--muted); line-height:1.8;
             padding:20px 24px; background:var(--card);
@@ -189,25 +206,31 @@
         .crumb-current { color:var(--text); font-weight:600; }
 
         /* ── HOME ── */
-        #view-home { display:block; background:linear-gradient(180deg,#fafafa 0%,var(--bg) 400px); min-height:calc(100vh - 52px); }
+        #view-home { display:block; background:var(--bg); min-height:calc(100vh - 52px); }
         #view-country { display:none; }
 
         .home-hero {
-            max-width:1240px; margin:0 auto; padding:56px 28px 4px;
+            max-width:1240px; margin:0 auto; padding:72px 28px 24px;
+            border-bottom:1px solid var(--border);
         }
         .home-eyebrow {
             display:inline-flex; align-items:center; gap:8px;
-            font-size:10px; font-weight:700; letter-spacing:1.6px;
-            color:var(--muted); text-transform:uppercase;
-            margin-bottom:18px; padding:5px 10px 5px 10px;
-            border:1px solid var(--border); border-radius:999px;
-            background:#fff;
+            font-size:10px; font-weight:700; letter-spacing:2px;
+            color:var(--bb-graphite); text-transform:uppercase;
+            margin-bottom:22px;
         }
-        .home-hero h1 { font-family:'Outfit',sans-serif; font-size:44px; font-weight:800; letter-spacing:-1.5px; line-height:1.05; margin-bottom:14px; }
-        .home-hero h1 em { font-style:normal; color:#52525b; }
+        .home-eyebrow::before {
+            content:""; width:24px; height:2px; background:var(--bb-cherry); display:inline-block;
+        }
+        .home-hero h1 {
+            font-family:'Manrope',sans-serif; font-size:56px; font-weight:800;
+            letter-spacing:-2px; line-height:1.02; margin-bottom:18px;
+            color:var(--text);
+        }
+        .home-hero h1 em { font-style:normal; color:var(--muted); font-weight:600; }
         .home-hero-lead { color:var(--muted); font-size:15px; line-height:1.65; max-width:620px; }
         .home-hero-meta {
-            display:flex; flex-wrap:wrap; gap:18px 28px; margin-top:24px;
+            display:flex; flex-wrap:wrap; gap:18px 28px; margin-top:28px;
             font-size:12px; color:var(--muted); font-weight:500;
         }
         .home-hero-meta div { display:flex; align-items:center; gap:6px; }
@@ -218,122 +241,117 @@
         .home-container { max-width:1240px; margin:0 auto; padding:14px 28px 64px; }
 
         .section-label {
-            font-size:10px; font-weight:700; letter-spacing:1.4px;
-            color:var(--muted); text-transform:uppercase;
-            margin:36px 0 16px; display:flex; align-items:center; gap:10px;
+            font-size:10px; font-weight:700; letter-spacing:2px;
+            color:var(--text); text-transform:uppercase;
+            margin:48px 0 18px; display:flex; align-items:center; gap:12px;
         }
-        .section-label::after { content:""; flex:1; height:1px; background:var(--border); }
+        .section-label::before { content:""; width:18px; height:2px; background:var(--bb-cherry); display:inline-block; }
 
+        /* TOTAL card · editorial · "The Box" inspired */
         .total-card {
-            background:linear-gradient(135deg,#18181b 0%,#27272a 100%);
-            color:#fff; border-radius:18px; padding:32px 36px;
+            background:var(--bb-graphite);
+            color:#fff; border-radius:6px; padding:36px 40px;
             cursor:pointer; position:relative; overflow:hidden;
             transition:transform 0.18s, box-shadow 0.18s;
-            display:grid; grid-template-columns:1.2fr 2.4fr auto; gap:36px; align-items:center;
-            border: 1px solid transparent;
-            background-clip: padding-box;
-            box-shadow: 0 0 0 1px rgba(212,212,216,0.18), inset 0 1px 0 rgba(228,228,231,0.12);
+            display:grid; grid-template-columns:1.1fr 2.6fr auto; gap:36px; align-items:center;
         }
-        .total-card::after {
-            content:""; position:absolute; inset:0; border-radius:18px; pointer-events:none;
-            background: linear-gradient(135deg, rgba(228,228,231,0.07) 0%, transparent 45%, rgba(161,161,170,0.06) 100%);
-        }
-        .total-card:hover { transform:translateY(-2px); box-shadow:0 20px 50px rgba(0,0,0,0.35), 0 0 0 1px rgba(212,212,216,0.25); }
-        .total-card::before {
-            content:""; position:absolute; top:-60px; right:-60px;
-            width:280px; height:280px; border-radius:50%;
-            background:radial-gradient(circle,rgba(13,148,136,0.22) 0%,transparent 65%);
-            pointer-events:none;
-        }
+        .total-card:hover { transform:translateY(-2px); box-shadow:0 24px 50px -20px rgba(45,44,43,0.45); }
         .total-card-left { position:relative; z-index:1; }
         .total-flag-badge {
-            font-family:'Outfit',sans-serif; font-size:13px; font-weight:700; letter-spacing:1.5px;
-            display:inline-block; margin-bottom:14px;
-            background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.9);
-            border:1px solid rgba(255,255,255,0.2); border-radius:6px;
-            padding:5px 10px;
+            font-family:'Manrope',sans-serif; font-size:11px; font-weight:700; letter-spacing:2px;
+            display:inline-block; margin-bottom:16px;
+            background:transparent; color:var(--bb-yellow);
+            border:1.5px solid var(--bb-yellow); border-radius:4px;
+            padding:4px 9px;
         }
-        .total-name { font-family:'Outfit',sans-serif; font-size:26px; font-weight:800; letter-spacing:-0.8px; margin-bottom:4px; }
-        .total-sub  { font-size:13px; color:rgba(255,255,255,0.6); font-weight:500; }
+        .total-name { font-family:'Manrope',sans-serif; font-size:30px; font-weight:800; letter-spacing:-1px; margin-bottom:6px; line-height:1.05; }
+        .total-sub  { font-size:13px; color:rgba(255,255,255,0.55); font-weight:500; letter-spacing:0.2px; }
         .total-stats {
-            display:grid; grid-template-columns:repeat(3,1fr); gap:22px;
+            display:grid; grid-template-columns:repeat(3,1fr); gap:28px;
             position:relative; z-index:1;
         }
-        .total-stat-label { font-size:10px; text-transform:uppercase; letter-spacing:.8px; color:rgba(255,255,255,0.55); font-weight:600; margin-bottom:6px; }
+        .total-stat-label { font-size:10px; text-transform:uppercase; letter-spacing:1.2px; color:rgba(255,255,255,0.5); font-weight:700; margin-bottom:8px; }
         .total-stat-val   {
-            font-size:22px; font-weight:700; letter-spacing:-0.4px; font-variant-numeric:tabular-nums; line-height:1.1; margin-bottom:4px;
-            background: linear-gradient(160deg, #ffffff 30%, #d4d4d8 60%, #f4f4f5 100%);
-            -webkit-background-clip: text; background-clip: text; color: transparent;
+            font-size:26px; font-weight:800; letter-spacing:-0.6px; font-variant-numeric:tabular-nums; line-height:1.1; margin-bottom:6px;
+            color:#fff;
         }
-        .total-stat-delta { font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:3px; padding:2px 7px; border-radius:4px; }
-        .tstat-up   { background:rgba(13,148,136,0.25);  color:#5eead4; }
-        .tstat-down { background:rgba(225,29,72,0.25);   color:#fda4af; }
+        .total-stat-delta { font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:3px; padding:3px 8px; border-radius:3px; letter-spacing:0.2px; }
+        .tstat-up   { background:rgba(69,228,190,0.18);  color:var(--bb-green); }
+        .tstat-down { background:rgba(219,27,77,0.20);   color:#ff8aa5; }
         .total-cta {
-            background:#fff; color:#18181b; border-radius:50%;
-            width:52px; height:52px; display:flex; align-items:center; justify-content:center;
-            font-size:22px; font-weight:700; transition:transform 0.15s;
+            background:var(--bb-yellow); color:var(--bb-graphite); border-radius:50%;
+            width:54px; height:54px; display:flex; align-items:center; justify-content:center;
+            font-size:24px; font-weight:800; transition:transform 0.15s;
             position:relative; z-index:1;
         }
-        .total-card:hover .total-cta { transform:translateX(3px); }
+        .total-card:hover .total-cta { transform:translateX(4px); }
 
-        /* Country cards */
+        /* Country cards · editorial */
         .country-grid {
             display:grid; grid-template-columns:repeat(3,1fr); gap:20px;
         }
         .country-card {
-            background:var(--card); border:1px solid var(--border); border-radius:16px;
+            background:var(--card); border:1px solid var(--border); border-radius:6px;
             padding:0; cursor:pointer;
             transition:box-shadow 0.2s, transform 0.15s, border-color 0.15s;
             position:relative; overflow:hidden;
             display:flex; flex-direction:column;
         }
-        .country-card:hover { box-shadow:0 12px 36px rgba(0,0,0,0.1); transform:translateY(-3px); border-color:#d1d5db; }
+        /* Color bar at the top — identifies each country */
+        .country-card::before {
+            content:""; position:absolute; top:0; left:0; right:0; height:4px;
+            background:var(--country-accent, var(--bb-graphite));
+        }
+        .country-card:hover { box-shadow:0 14px 36px -10px rgba(45,44,43,0.18); transform:translateY(-3px); border-color:var(--bb-graphite); }
         .country-card-top {
-            padding:20px 22px 16px;
+            padding:24px 22px 18px;
             border-bottom:1px solid var(--border);
             display:flex; align-items:center; gap:14px;
         }
         .country-ident { display:flex; align-items:center; gap:14px; }
         .country-flag-box {
-            width:42px; height:42px; border-radius:10px;
+            width:44px; height:44px; border-radius:4px;
             display:flex; align-items:center; justify-content:center;
             flex-shrink:0;
-            font-family:'Outfit',sans-serif; font-size:12px; font-weight:700;
-            letter-spacing:1px;
+            font-family:'Manrope',sans-serif; font-size:12px; font-weight:800;
+            letter-spacing:1.5px;
+            background:var(--country-accent, var(--bb-graphite));
+            color:#fff;
         }
         .country-name-box { line-height:1.25; }
-        .country-name-box h3 { font-family:'Outfit',sans-serif; font-size:16px; font-weight:700; letter-spacing:-0.4px; }
-        .country-name-box span { font-size:11px; color:var(--muted); font-weight:500; }
+        .country-name-box h3 { font-family:'Manrope',sans-serif; font-size:18px; font-weight:800; letter-spacing:-0.5px; }
+        .country-name-box span { font-size:11px; color:var(--muted); font-weight:500; letter-spacing:0.2px; }
 
         .country-card-body {
-            padding:16px 22px 18px; display:flex; flex-direction:column; gap:11px; flex:1;
+            padding:18px 22px 20px; display:flex; flex-direction:column; gap:12px; flex:1;
         }
         .ckpi { display:flex; align-items:center; justify-content:space-between; }
-        .ckpi-label { font-size:11px; color:var(--muted); font-weight:500; text-transform:uppercase; letter-spacing:.4px; }
-        .ckpi-right { display:flex; align-items:center; gap:8px; }
-        .ckpi-val { font-size:14px; font-weight:700; font-variant-numeric:tabular-nums; }
-        .ckpi-pct { font-size:11px; font-weight:600; padding:3px 8px; border-radius:5px; font-variant-numeric:tabular-nums; letter-spacing:0; }
-        .kpi-up   { background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0; }
-        .kpi-down { background:#fef2f2; color:#dc2626; border:1px solid #fecaca; }
+        .ckpi-label { font-size:10px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:1px; }
+        .ckpi-right { display:flex; align-items:center; gap:10px; }
+        .ckpi-val { font-size:16px; font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:-0.3px; }
+        .ckpi-pct { font-size:11px; font-weight:700; padding:3px 8px; border-radius:3px; font-variant-numeric:tabular-nums; letter-spacing:0.2px; }
+        .kpi-up   { background:var(--up-bg);   color:var(--up);   border:1px solid var(--up-border); }
+        .kpi-down { background:var(--down-bg); color:var(--down); border:1px solid var(--down-border); }
 
         .country-card-foot {
-            padding:14px 24px; background:#fafafa;
+            padding:14px 22px; background:#fafafa;
             border-top:1px solid var(--border);
             display:flex; align-items:center; justify-content:space-between;
-            font-size:12px; font-weight:600; color:var(--muted);
+            font-size:12px; font-weight:700; color:var(--text);
             transition:background 0.15s, color 0.15s;
+            letter-spacing:-0.1px;
         }
-        .country-card:hover .country-card-foot { background:#18181b; color:#fff; }
+        .country-card:hover .country-card-foot { background:var(--bb-graphite); color:#fff; }
         .country-card-foot .arrow { font-size:15px; transition:transform 0.2s; }
         .country-card:hover .country-card-foot .arrow { transform:translateX(4px); }
 
         /* Home footer note */
         .home-foot {
-            margin-top:40px; padding:20px 24px; background:var(--card);
-            border-radius:10px; border:1px solid var(--border);
-            font-size:12px; color:var(--muted); line-height:1.8;
+            margin-top:48px; padding:22px 26px; background:#fafafa;
+            border-radius:6px; border:1px solid var(--border);
+            font-size:13px; color:var(--muted); line-height:1.7;
         }
-        .home-foot strong { color:var(--text); }
+        .home-foot strong { color:var(--text); font-weight:700; }
 
         /* ── ANIMATIONS ── */
         @keyframes fadeUp {
@@ -403,9 +421,10 @@
 <div id="view-home">
     <div class="home-hero">
         <div class="home-eyebrow">LatAm · Marketing Performance · 2026</div>
-        <h1>Elasticidades <em>Spend → Resultados</em></h1>
+        <h1>Elasticidades<br><em>Spend → Resultados.</em></h1>
+        <p class="home-hero-lead">Cuánto rinde cada peso que metemos en ads. Mirá un país o el consolidado regional para entender qué está pasando esta semana.</p>
         <div class="home-hero-meta">
-            <div>Actualizado: <strong id="home-date">—</strong></div>
+            <div>Actualizado <strong id="home-date">—</strong></div>
         </div>
     </div>
 
@@ -419,7 +438,7 @@
         </div>
 
         <div class="home-foot">
-            <strong>Click en cualquier tarjeta</strong> para ver el análisis detallado: elasticidades por canal, evolución semanal de CPA/CPS y CVR.
+            Tocá cualquier tarjeta para ver el detalle: <strong>elasticidades por canal</strong>, evolución semanal de <strong>CPA/CPS</strong> y <strong>CVR</strong>.
         </div>
     </div>
 </div>
@@ -694,11 +713,12 @@
 // ══════════════════════════════════════════════
 //  DATA
 // ══════════════════════════════════════════════
+// Paleta de marca Bigbox por país (manual: cada categoría/identidad un color)
 const COUNTRIES_META = {
-    TOTAL: { name:'Total LatAm', flag:'LA', sub:'AR + CL + UY', cardClass:'country-card-total', accent:'#27272a' },
-    AR:    { name:'Argentina',   flag:'AR', sub:'Buenos Aires · 2026', cardClass:'', accent:'#1d4ed8' },
-    CL:    { name:'Chile',       flag:'CL', sub:'Santiago · 2026', cardClass:'', accent:'#dc2626' },
-    UY:    { name:'Uruguay',     flag:'UY', sub:'Montevideo · 2026', cardClass:'', accent:'#0d9488' },
+    TOTAL: { name:'Total LatAm', flag:'LA', sub:'AR + CL + UY', cardClass:'country-card-total', accent:'#2d2c2b' }, // graphite
+    AR:    { name:'Argentina',   flag:'AR', sub:'Buenos Aires · 2026', cardClass:'', accent:'#3f2a56' }, // violet · estar bien
+    CL:    { name:'Chile',       flag:'CL', sub:'Santiago · 2026',     cardClass:'', accent:'#db1b4d' }, // cherry · gastronomía
+    UY:    { name:'Uruguay',     flag:'UY', sub:'Montevideo · 2026',   cardClass:'', accent:'#1e9c7d' }, // green · escapadas
 };
 
 const DATA = /*__BUILD_DATA__*/{};
@@ -813,10 +833,11 @@ function buildHomeCards() {
 
         const card = document.createElement('div');
         card.className = 'country-card';
+        card.style.setProperty('--country-accent', meta.accent);
         card.innerHTML = `
             <div class="country-card-top">
                 <div class="country-ident">
-                    <div class="country-flag-box" style="background:${meta.accent}15; color:${meta.accent}; border:1.5px solid ${meta.accent}30;">${meta.flag}</div>
+                    <div class="country-flag-box">${meta.flag}</div>
                     <div class="country-name-box">
                         <h3>${meta.name}</h3>
                         <span>${meta.sub}</span>
@@ -1052,7 +1073,7 @@ function renderElas(code) {
 // ══════════════════════════════════════════════
 //  CHART HELPERS
 // ══════════════════════════════════════════════
-Chart.defaults.font.family = "'DM Sans', -apple-system, sans-serif";
+Chart.defaults.font.family = "'Manrope', -apple-system, sans-serif";
 Chart.defaults.font.size   = 11;
 Chart.defaults.color       = '#6b7280';
 
@@ -1076,8 +1097,9 @@ function makePeriodShadePlugin(bi0, bi1, ai0, ai1) {
                 ctx.fillRect(px0, chartArea.top, px1-px0, chartArea.height);
                 ctx.restore();
             };
-            shade(bi0, bi1, 'rgba(0,0,0,0.09)');
-            shade(ai0, ai1, 'rgba(13,148,136,0.16)');
+            // Base = gris suave · Actual = verde Bigbox (Escapadas) suave
+            shade(bi0, bi1, 'rgba(45,44,43,0.06)');
+            shade(ai0, ai1, 'rgba(69,228,190,0.18)');
         }
     };
 }
@@ -1179,9 +1201,10 @@ function avgArr(arr, i0, i1) {
 }
 
 function lineDs(label, data) {
+    // Línea en grafito Bigbox — la métrica (CPA/CPS/CVR) sobresale del color del canal
     return { type:'line', label, data, yAxisID:'yResult',
-             borderColor:'#18181b', backgroundColor:'transparent',
-             borderWidth:2.5, pointRadius:3, pointBackgroundColor:'#18181b',
+             borderColor:'#2d2c2b', backgroundColor:'transparent',
+             borderWidth:2.5, pointRadius:3, pointBackgroundColor:'#2d2c2b',
              tension:0.25, order:0 };
 }
 function barDs(label, data, color) {
@@ -1210,7 +1233,8 @@ function initEvolucion(code) {
     const cps_google = E.spend_google.map((s,i) => ses_google[i]>0         ? +(s/ses_google[i]).toFixed(5)     : null);
     const cps_meta   = E.spend_meta.map((s,i)   => (E.ses_meta[i]||0)>0   ? +(s/E.ses_meta[i]).toFixed(5)    : null);
     
-    const C = { total:'rgba(196,181,253,0.85)', google:'rgba(252,211,77,0.85)', meta:'rgba(147,197,253,0.85)' };
+    // Paleta Bigbox por canal — Google=Amarillo (Aventura), Meta=Cherry (Gastronomía), Total=Violet (Estar bien)
+    const C = { total:'rgba(182,182,239,0.95)', google:'rgba(255,199,21,0.90)', meta:'rgba(219,27,77,0.80)' };
     
     makeChart('c-total-purch',  labels, [barDs('Purchases',E.purch_total,C.total),  lineDs('CPA',cpa_total)],  'CPA (USD)','Purchases','money',bi0,bi1,ai0,ai1);
     makeChart('c-total-ses',    labels, [barDs('Sesiones', E.ses_total,  C.total),  lineDs('CPS',cps_total)],  'CPS (USD)','Sesiones', 'money',bi0,bi1,ai0,ai1);
@@ -1253,7 +1277,8 @@ function initCVR(code) {
     const cvr_google = purch_google.map((p,i)    => ses_google[i]>0        ? +(p/ses_google[i]*100).toFixed(4)   : null);
     const cvr_meta   = E.purch_meta.map((p,i)    => (E.ses_meta[i]||0)>0  ? +(p/E.ses_meta[i]*100).toFixed(4)   : null);
     
-    const C = { total:'rgba(196,181,253,0.85)', google:'rgba(252,211,77,0.85)', meta:'rgba(147,197,253,0.85)' };
+    // Paleta Bigbox por canal — Google=Amarillo (Aventura), Meta=Cherry (Gastronomía), Total=Violet (Estar bien)
+    const C = { total:'rgba(182,182,239,0.95)', google:'rgba(255,199,21,0.90)', meta:'rgba(219,27,77,0.80)' };
     
     makeChart('cv-total',  labels, [barDs('Purchases',E.purch_total,C.total),  lineDs('CVR (%)',cvr_total)],  'CVR (%)','Purchases','pct',bi0,bi1,ai0,ai1);
     makeChart('cv-meta',   labels, [barDs('Purchases',E.purch_meta, C.meta),   lineDs('CVR (%)',cvr_meta)],   'CVR (%)','Purchases','pct',bi0,bi1,ai0,ai1);
