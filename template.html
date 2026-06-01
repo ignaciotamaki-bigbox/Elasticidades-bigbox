@@ -560,9 +560,6 @@
             <div id="evo-sub" class="page-meta">
                 <span class="meta-chip"><b>Base</b> W10–W13</span>
                 <span class="meta-chip"><b>Actual</b> W14–W15</span>
-                <span class="meta-chip-sep"></span>
-                <span class="meta-chip">Eje izq.: Spend USD</span>
-                <span class="meta-chip">Eje der.: Volumen</span>
             </div>
         </div>
         <div class="chart-section">
@@ -645,9 +642,6 @@
             <div id="cvr-sub" class="page-meta">
                 <span class="meta-chip"><b>Base</b> W10–W13</span>
                 <span class="meta-chip"><b>Actual</b> W14–W15</span>
-                <span class="meta-chip-sep"></span>
-                <span class="meta-chip">Eje izq.: Purchases</span>
-                <span class="meta-chip">Eje der.: CVR %</span>
             </div>
         </div>
         <div class="chart-section">
@@ -1088,6 +1082,27 @@ function makePeriodShadePlugin(bi0, bi1, ai0, ai1) {
     };
 }
 
+function paddedRange(values, pad) {
+    const vs = values.filter(v => v!=null && isFinite(v));
+    if (!vs.length) return { min: undefined, max: undefined };
+    let mn = Math.min(...vs), mx = Math.max(...vs);
+    if (mn === mx) { const d = Math.abs(mn) || 1; mn -= d*0.1; mx += d*0.1; return { min: mn, max: mx }; }
+    const range = mx - mn;
+    const p = pad == null ? 0.15 : pad;
+    let outMin = mn - range * p;
+    let outMax = mx + range * p;
+    // Si todos los valores son positivos, no bajamos por debajo de 0
+    if (mn >= 0 && outMin < 0) outMin = 0;
+    return { min: outMin, max: outMax };
+}
+
+function paddedMax(values, pad) {
+    const vs = values.filter(v => v!=null && isFinite(v));
+    if (!vs.length) return undefined;
+    const mx = Math.max(...vs);
+    return mx * (1 + (pad == null ? 0.12 : pad));
+}
+
 function makeChart(canvasId, labels, datasets, resultLabel, leftLabel, rightFmt, bi0, bi1, ai0, ai1) {
     // Destroy existing
     if (chartInstances[canvasId]) { chartInstances[canvasId].destroy(); delete chartInstances[canvasId]; }
@@ -1101,7 +1116,16 @@ function makeChart(canvasId, labels, datasets, resultLabel, leftLabel, rightFmt,
         : rightFmt==='pct'
         ? v => v.toFixed(2).replace('.',',')+'%'
         : v => v>=1000?(v/1000).toFixed(0)+'K':String(Math.round(v));
-    
+
+    // Compute padded ranges from datasets
+    const leftVals = [], rightVals = [];
+    datasets.forEach(ds => {
+        const target = ds.yAxisID === 'yResult' ? rightVals : leftVals;
+        (ds.data || []).forEach(v => target.push(v));
+    });
+    const rightRange = paddedRange(rightVals, 0.18);
+    const leftTopPad = paddedMax(leftVals, 0.12);
+
     const plugin = makePeriodShadePlugin(bi0, bi1, ai0, ai1);
     const chart = new Chart(ctx, {
         plugins: [plugin],
@@ -1123,9 +1147,12 @@ function makeChart(canvasId, labels, datasets, resultLabel, leftLabel, rightFmt,
             scales:{
                 x:{ grid:{display:false}, ticks:{font:{size:10}} },
                 ySpend:{ type:'linear', position:'left', stacked:true, grid:{color:'#f3f4f6'},
+                    beginAtZero:true,
+                    suggestedMax: leftTopPad,
                     ticks:{font:{size:10}, callback:leftTickCb},
                     title:{display:true, text:leftLabel||'USD', font:{size:10}, color:'#9ca3af'} },
                 yResult:{ type:'linear', position:'right', grid:{display:false},
+                    min: rightRange.min, max: rightRange.max,
                     ticks:{font:{size:10}, callback:rightTickCb},
                     title:{display:true, text:resultLabel, font:{size:10}, color:'#9ca3af'} }
             }
@@ -1167,6 +1194,10 @@ function initEvolucion(code) {
     const n = E.weeks.length;
     const bi0=9, bi1=Math.min(12,n-1), ai0=13, ai1=Math.min(14,n-1);
     const labels = E.weeks;
+
+    // Sub-header dinámico (Base / Actual según país)
+    const bw = DATA[code].elas.base_weeks, aw = DATA[code].elas.actual_weeks;
+    set('evo-sub', `<span class="meta-chip"><b>Base</b> ${bw}</span><span class="meta-chip"><b>Actual</b> ${aw}</span>`);
     
     const purch_google = E.purch_search.map((v,i) => (v||0)+(E.purch_pmax[i]||0));
     const ses_google   = E.ses_search.map((v,i)   => (v||0)+(E.ses_pmax[i]||0));
@@ -1210,6 +1241,10 @@ function initCVR(code) {
     const n = E.weeks.length;
     const bi0=9, bi1=Math.min(12,n-1), ai0=13, ai1=Math.min(14,n-1);
     const labels = E.weeks;
+
+    // Sub-header dinámico (Base / Actual según país)
+    const bw = DATA[code].elas.base_weeks, aw = DATA[code].elas.actual_weeks;
+    set('cvr-sub', `<span class="meta-chip"><b>Base</b> ${bw}</span><span class="meta-chip"><b>Actual</b> ${aw}</span>`);
     
     const purch_google = E.purch_search.map((v,i) => (v||0)+(E.purch_pmax[i]||0));
     const ses_google   = E.ses_search.map((v,i)   => (v||0)+(E.ses_pmax[i]||0));
