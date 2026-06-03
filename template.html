@@ -70,6 +70,14 @@ body{ font-family:'Inter',-apple-system,sans-serif; background:var(--bg); color:
 /* LAYOUT */
 .wrap{ padding:10px 14px 60px; display:flex; flex-direction:column; gap:4px; }
 
+/* WARNINGS */
+#warnings:empty{ display:none; }
+#warnings{ display:flex; flex-direction:column; gap:8px; margin-bottom:6px; }
+.warn{ display:flex; gap:10px; align-items:flex-start; background:#fff8e6; border:1px solid #f3d278;
+  border-left:3px solid #e0a200; border-radius:3px; padding:9px 12px; font-size:12px; color:#6b4e00; line-height:1.5; }
+.warn svg{ flex-shrink:0; width:16px; height:16px; stroke:#c98a00; margin-top:1px; }
+.warn b{ color:#5a4100; font-weight:600; }
+
 /* RATIO ROW */
 .ratio-row{ margin-bottom:11px; }
 .ratio-head{ display:flex; align-items:center; gap:11px; padding:9px 2px; border-bottom:1px solid var(--border); margin-bottom:9px; }
@@ -179,6 +187,7 @@ table.blot{ width:100%; border-collapse:collapse; }
 </div>
 
 <div class="wrap">
+  <div id="warnings"></div>
   <div id="grid"></div>
 
   <div class="section-h" id="blot-title">Matriz de elasticidades por canal</div>
@@ -447,6 +456,14 @@ function renderBlotter(){
   </tr>`).join('');
 }
 
+// ── warnings (los provee build.py en DATA.warnings) ──
+function renderWarnings(){
+  const host=document.getElementById('warnings'); if(!host) return; host.innerHTML='';
+  const ws=(DATA && Array.isArray(DATA.warnings)) ? DATA.warnings : [];
+  const icon='<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+  ws.forEach(w=>{ const el=document.createElement('div'); el.className='warn'; el.innerHTML=icon+'<div>'+(w.message||'')+'</div>'; host.appendChild(el); });
+}
+
 // ── filtros ──
 function bindSeg(id,onPick){ document.getElementById(id).querySelectorAll('button').forEach(btn=>{
   btn.onclick=()=>{ document.getElementById(id).querySelectorAll('button').forEach(b=>b.classList.remove('on'));
@@ -474,6 +491,7 @@ function refresh(){
 
   bindSeg('seg-pais', v=>{ PAIS=v; refresh(); });
   bindSeg('seg-chan', v=>{ CHAN=v; refresh(); });
+  renderWarnings();
   refresh();
 })();
 </script>
